@@ -21,7 +21,7 @@ namespace PrjModule24.Controllers
         [Route("Users")]
         public IActionResult Get()
         {
-            return Ok(UserStab.UsersDb.ToArray());
+            return Ok(_db.GetUsers());
         }
 
         [HttpGet]
