@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using PrjModule24.Models.Shared;
 
 namespace PrjModule24.Models
@@ -11,8 +12,10 @@ namespace PrjModule24.Models
         public string Password { get; set; }
 
         [Required] public Role Role { get; set; }
-        [Required] public Account Account { get; set; }
+        public Account Account { get; set; }
 
-        [Key] public string Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string Id { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace PrjModule24.Controllers
 
         [HttpPost]
         [Route("Deposit={amount}")]
-        public IActionResult DepositMoneyToAccount(string id, int amount)
+        public IActionResult DepositMoneyToAccount(string id, decimal amount)
         {
             var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
             if (user == null)
@@ -43,7 +43,7 @@ namespace PrjModule24.Controllers
 
         [HttpPost]
         [Route("Withdrawal={amount}")]
-        public IActionResult WithdrawalMoneyFromAccount(string id, int amount)
+        public IActionResult WithdrawalMoneyFromAccount(string id, decimal amount)
         {
             var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
             if (user == null)
