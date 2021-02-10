@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PrjModule24.Services.Interfaces;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PrjModule24.Controllers
 {
@@ -11,7 +13,7 @@ namespace PrjModule24.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IEfFileFolderContext _db;
 
-        public UserController(IEfFileFolderContext context,ILogger<UserController> logger)
+        public UserController(IEfFileFolderContext context, ILogger<UserController> logger)
         {
             _logger = logger;
             _db = context;
@@ -19,17 +21,24 @@ namespace PrjModule24.Controllers
 
         [HttpGet]
         [Route("Users")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(_db.GetUsers());
+            var users = await _db.GetUsersAsync();
+            
+            if (users.Count > 0)
+                return Ok(users);
+
+            return NotFound();
         }
 
         [HttpGet]
         [Route("User/{id}")]
-        public IActionResult Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
-            var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
-            return user == null ? NotFound() : Ok(user);
+            var guid = Guid.Parse(id);
+            var user = await _db.GetUserAsync(guid);
+            return user.Match<IActionResult>(Ok, NotFound());
+            
         }
     }
 }

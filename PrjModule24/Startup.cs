@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using PrjModule24.Models.DataBase;
+using PrjModule24.Services.DataBase;
 using PrjModule24.Services.Interfaces;
 
 namespace PrjModule24
@@ -29,7 +29,9 @@ namespace PrjModule24
             services.AddScoped<IApplicationDbContext, ApplicationContext>();
             services.AddScoped<IEfFileFolderContext, EfFileFolderContext>();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "PrjModule24", Version = "v1"});

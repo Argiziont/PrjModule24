@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using PrjModule24.Services.Interfaces;
 
 namespace PrjModule24.Controllers
 {
@@ -9,57 +11,78 @@ namespace PrjModule24.Controllers
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> _logger;
-
-        public AccountController(ILogger<AccountController> logger)
+        private readonly IEfFileFolderContext _db;
+        
+        public AccountController(IEfFileFolderContext db, ILogger<AccountController> logger)
         {
             _logger = logger;
+            _db = db;
         }
 
         [HttpPost]
         [Route("Open")]
-        public IActionResult OpenAccount(string id)
+        public async Task<IActionResult> OpenAccount(string id)
         {
-            var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-                return NotFound();
+            var guid = Guid.Parse(id);
+            var account = await _db.UpdateAccountStateAsync(guid, true);
+            
+            return account.Match<IActionResult>(Ok, NotFound());
+        }
 
-            user.Account.State = true;
+        [HttpPost]
+        [Route("Close")]
+        public async Task<IActionResult> CloseAccount(string id)
+        {
+            var guid = Guid.Parse(id);
+            var account = await _db.UpdateAccountStateAsync(guid, false);
 
-            return Ok(user.Account);
+            return account.Match<IActionResult>(Ok, NotFound());
         }
 
         [HttpPost]
         [Route("Deposit={amount}")]
-        public IActionResult DepositMoneyToAccount(string id, decimal amount)
+        public async Task<IActionResult> DepositMoneyToAccount(string id, decimal amount)
         {
-            var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-                return NotFound();
+            var guid = Guid.Parse(id);
+            var active=false;
+            _db.GetAccountAsync(guid).Result.Match((acc) => active = acc.State,null);
+            
+            if (!active)
+            {
+                return StatusCode(405);
+            }
 
-            user.Account.Money += amount;
-
-            return Ok(user.Account);
+            var account = await _db.UpdateAccountMoneyAsync(guid, amount);
+            
+            return account.Match<IActionResult>(Ok, NotFound());
         }
 
         [HttpPost]
         [Route("Withdrawal={amount}")]
-        public IActionResult WithdrawalMoneyFromAccount(string id, decimal amount)
+        public async Task<IActionResult> WithdrawalMoneyFromAccount(string id, decimal amount)
         {
-            var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
-            if (user == null)
-                return NotFound();
+            var guid = Guid.Parse(id);
+            var active = false;
+            _db.GetAccountAsync(guid).Result.Match((acc) => active = acc.State, null);
 
-            user.Account.Money -= amount;
+            if (!active)
+            {
+                return StatusCode(405);
+            }
 
-            return Ok(user.Account);
+            var account = await _db.UpdateAccountMoneyAsync(guid, -amount);
+
+            return account.Match<IActionResult>(Ok, NotFound());
         }
 
         [HttpGet]
         [Route("GetBalance")]
-        public IActionResult GetAccountBalance(string id)
+        public async  Task<IActionResult> GetAccountBalance(string id)
         {
-            var user = UserStab.UsersDb.FirstOrDefault(u => u.Id == id);
-            return user == null ? NotFound() : Ok(user.Account.Money);
+            var guid = Guid.Parse(id);
+            var account = await _db.GetAccountAsync(guid);
+
+            return account.Match<IActionResult>((acc)=>Ok(acc.Money), NotFound());
         }
     }
 }
