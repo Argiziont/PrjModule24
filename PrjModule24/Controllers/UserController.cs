@@ -21,11 +21,6 @@ namespace PrjModule24.Controllers
         [Route("Users")]
         public IActionResult Get()
         {
-            for (int i = 1; i < UserStab.UsersDb.Count; i++)
-            {
-             _db.AddUser(UserStab.UsersDb[i]);
-
-            }
             return Ok(UserStab.UsersDb.ToArray());
         }
 
