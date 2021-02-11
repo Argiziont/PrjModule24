@@ -45,6 +45,7 @@ namespace PrjModule24.Controllers
             var authClaims = new List<Claim>
             {
                 new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.NameIdentifier,user.Id),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -88,7 +89,7 @@ namespace PrjModule24.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username,
-                
+
             };
             var addResult = await _userManager.CreateAsync(user, model.Password);
 
