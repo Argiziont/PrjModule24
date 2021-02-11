@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PrjModule24.Models;
 using PrjModule24.Models.Authenticate_Models;
 using PrjModule24.Services.Authorization;
 using PrjModule24.Services.DataBase;

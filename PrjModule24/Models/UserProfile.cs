@@ -2,14 +2,14 @@
 
 namespace PrjModule24.Models
 {
-    public record UserProfile
+    public class UserProfile
     {
         public int Id { get; set; }
 
         public string Name { get; set; }
         public int Age { get; set; }
 
-        public Guid UserId { get; set; }
-        public User User { get; set; }
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

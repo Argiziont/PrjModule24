@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using JWTAuthenticationWithSwagger.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PrjModule24.Services.Authorization;
 
 namespace PrjModule24.Controllers
 {
-    [UserAuthorization]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("[Controller]")]
     public class RolesController:ControllerBase

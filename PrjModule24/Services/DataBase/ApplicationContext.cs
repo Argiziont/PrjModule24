@@ -9,7 +9,6 @@ namespace PrjModule24.Services.DataBase
 {
     public sealed class ApplicationContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
     {
-        public DbSet<User> Users { get; set; }
         public DbSet<UserBankingAccount> BankingAccount { get; set; }
         public DbSet<UserProfile> Profile { get; set; }
 
