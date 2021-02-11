@@ -85,38 +85,6 @@ namespace PrjModule24.Services.Authorization
         public bool IsValidToken(string authToken)
         {
 
-
-            var z = ValidateToken(authToken);
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-                tokenHandler.ValidateToken(authToken, new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidAudience = _configuration["JWT:ValidAudience"],
-                    ValidIssuer = _configuration["JWT:ValidIssuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"])),
-
-                }, out SecurityToken validatedToken);
-
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = int.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
-
-
-
-                // attach user to context on successful jwt validation
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-        private bool ValidateToken(string authToken)
-        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = GetValidationParameters();
 
