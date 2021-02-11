@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PrjModule24.Services.Interfaces;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PrjModule24.Controllers

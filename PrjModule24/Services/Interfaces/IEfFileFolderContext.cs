@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using LanguageExt;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using PrjModule24.Models;
 
 namespace PrjModule24.Services.Interfaces

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using PrjModule24.Models.Shared;
 
 namespace PrjModule24.Models

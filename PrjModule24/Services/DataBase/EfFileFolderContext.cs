@@ -55,7 +55,6 @@ namespace PrjModule24.Services.DataBase
 
         public async Task<List<User>> GetUsersAsync()
         {
-
             return await _dbContext.Users
                 .Include(u => u.Profile)
                 .Include(u => u.BankingAccount)
@@ -75,15 +74,19 @@ namespace PrjModule24.Services.DataBase
 
         public async Task AddUserAsync(User user)
         {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
             #region StartValue
 
             //await using (_dbContext)
             //{
-            //    var user1 = new User { Login = "Kate", Password = "123456789",Id = Guid.NewGuid(),Role = Role.Admin};
-            //    var user2 = new User { Login = "Drake", Password = "123456789", Id = Guid.NewGuid(),Role = Role.User};
-            //    var user3 = new User { Login = "Jake", Password = "123456789", Id = Guid.NewGuid(),Role = Role.Moderator};
+            //   await _dbContext.Database.EnsureDeletedAsync();
+            //   await _dbContext.Database.EnsureCreatedAsync();
+            //    var user1 = new User { Login = "Kate", Password = "123456789", Id = Guid.NewGuid(), Role = Role.Admin };
+            //    var user2 = new User { Login = "Drake", Password = "123456789", Id = Guid.NewGuid(), Role = Role.User };
+            //    var user3 = new User { Login = "Jake", Password = "123456789", Id = Guid.NewGuid(), Role = Role.Moderator };
 
-            //    await _dbContext.Users.AddRangeAsync(user1, user2,user3);
+            //    await _dbContext.Users.AddRangeAsync(user1, user2, user3);
 
             //    var account1 = new UserBankingAccount { User = user1, Money = 1000 };
             //    var account2 = new UserBankingAccount { User = user2, Money = 1000 };
@@ -91,9 +94,9 @@ namespace PrjModule24.Services.DataBase
 
             //    await _dbContext.BankingAccount.AddRangeAsync(account1, account2, account3);
 
-            //    var profile1 = new UserProfile() { User = user1, Name = "Kate",Age = 24};
+            //    var profile1 = new UserProfile() { User = user1, Name = "Kate", Age = 24 };
             //    var profile2 = new UserProfile() { User = user2, Name = "Drake", Age = 31 };
-            //    var profile3 = new UserProfile() { User = user3, Name = "Jake",Age = 50};
+            //    var profile3 = new UserProfile() { User = user3, Name = "Jake", Age = 50 };
             //    await _dbContext.Profile.AddRangeAsync(profile1, profile2, profile3);
 
             //    await _dbContext.SaveChangesAsync();
