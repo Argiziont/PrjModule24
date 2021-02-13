@@ -22,7 +22,7 @@ namespace WebAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Open")]
-        public async Task<IActionResult> OpenAccount(string id)
+        public async Task<IActionResult> OpenAccountWithId(string id)
         {
             var account = await _db.UpdateAccountStateAsync(id, true);
 
@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Close")]
-        public async Task<IActionResult> CloseAccount(string id)
+        public async Task<IActionResult> CloseAccountWithId(string id)
         {
             var account = await _db.UpdateAccountStateAsync(id, false);
 
@@ -82,7 +82,7 @@ namespace WebAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Deposit={amount}")]
-        public async Task<IActionResult> DepositMoneyToAccount(string id, decimal amount)
+        public async Task<IActionResult> DepositMoneyToAccountWithId(string id, decimal amount)
         {
             var active = false;
             _db.GetAccountAsync(id).Result.Match(acc => active = acc.State, null);
@@ -126,7 +126,7 @@ namespace WebAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Withdrawal={amount}")]
-        public async Task<IActionResult> WithdrawalMoneyFromAccount(string id, decimal amount)
+        public async Task<IActionResult> WithdrawalMoneyFromAccountWithId(string id, decimal amount)
         {
             var active = false;
             _db.GetAccountAsync(id).Result.Match(acc => active = acc.State, null);
@@ -170,7 +170,7 @@ namespace WebAPI.Controllers
         [Authorize(Roles = "Admin,Moderator")]
         [HttpGet]
         [Route("{id}/GetBalance")]
-        public async Task<IActionResult> GetAccountBalance(string id)
+        public async Task<IActionResult> GetAccountBalanceWithId(string id)
         {
             var account = await _db.GetAccountAsync(id);
 

@@ -31,7 +31,7 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Route("User/{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetWithId(string id)
         {
             var user = await _dbContext.GetUser(id);
 

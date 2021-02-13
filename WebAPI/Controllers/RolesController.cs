@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI.Controllers
 {
@@ -42,8 +43,8 @@ namespace WebAPI.Controllers
                 {Status = "Error", Message = "Role delete failed! Please check user details and try again."});
         }
 
-        [HttpPost(nameof(DeleteById))]
-        public async Task<IActionResult> DeleteById(string id)
+        [HttpPost(nameof(DeleteWithId))]
+        public async Task<IActionResult> DeleteWithId(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
@@ -62,9 +63,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(nameof(GetRoles))]
-        public IActionResult GetRoles()
+        public async Task<IActionResult> GetRoles()
         {
-            var roles = _roleManager.Roles.ToArray();
+            var roles = await _roleManager.Roles.ToArrayAsync();
 
             return Ok(roles);
         }
