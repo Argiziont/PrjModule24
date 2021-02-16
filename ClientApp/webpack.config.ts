@@ -34,6 +34,11 @@ const config: webpack.Configuration = {
     contentBase: path.join(__dirname, "build"),
     compress: true,
     port: 4000,
+    historyApiFallback: true,
+    hot: true
+  },
+  performance : {
+    hints : false
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin({

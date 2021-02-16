@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
+import { History } from "../../_services";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -90,7 +91,6 @@ export const RegisterPage: React.FC<LoginRegisterProps> = ({
             id="email"
             type="text"
             autoComplete="email"
-            autoFocus
             error={errors.email && true}
             helperText={errors.email && "*Email is required"}
           />
@@ -150,6 +150,7 @@ export const RegisterPage: React.FC<LoginRegisterProps> = ({
               <Link href="#" variant="body2" onClick={
                 () => {
                   setIsRegister(false);
+                  History.push('/Login');
                 }
               }>
                 {"Already have an account? Sign In"}

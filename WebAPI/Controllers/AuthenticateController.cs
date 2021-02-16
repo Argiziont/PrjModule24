@@ -87,7 +87,6 @@ namespace WebAPI.Controllers
                 UserName = model.Username
             };
             var addResult = await _userManager.CreateAsync(user, model.Password);
-            
 
             if (!addResult.Succeeded )
                 return StatusCode(StatusCodes.Status500InternalServerError,

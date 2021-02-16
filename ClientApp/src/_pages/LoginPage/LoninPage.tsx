@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
+import { History } from "../../_services";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -119,6 +120,7 @@ export const LoninPage: React.FC<LoginRegisterProps> = ({
               <Link href="#" variant="body2" onClick={
                 () => {
                   setIsRegister(true);
+                  History.push('/Register');
                 }}
               >
                 {"Don't have an account? Sign Up"}
