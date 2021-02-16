@@ -24,13 +24,9 @@ namespace WebAPI.Controllers
         [HttpPost(nameof(Create))]
         public async Task<IActionResult> Create(string name)
         {
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-            }
-
             if (string.IsNullOrEmpty(name))
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response
-                    {Status = "Error", Message = "Role delete failed! Please check user details and try again."});
+                    {Status = "Error", Message = "Role create failed! Please check user details and try again."});
 
             var result = await _roleManager.CreateAsync(new IdentityRole(name));
             if (result.Succeeded)
@@ -40,7 +36,7 @@ namespace WebAPI.Controllers
             foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
 
             return StatusCode(StatusCodes.Status500InternalServerError, new Response
-                {Status = "Error", Message = "Role delete failed! Please check user details and try again."});
+                {Status = "Error", Message = "Role create failed! Please check user details and try again." });
         }
 
         [HttpPost(nameof(DeleteWithId))]

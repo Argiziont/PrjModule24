@@ -14,8 +14,5 @@ namespace WebAPI.Models.Authenticate_Models
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
-
-
-        public string Role { get; set; }
     }
 }

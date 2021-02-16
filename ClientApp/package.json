@@ -4,7 +4,8 @@
     "dependencies": {
         "@types/react-redux": "^7.1.16",
         "react": "^17.0.1",
-        "react-dom": "^17.0.1"
+        "react-dom": "^17.0.1",
+        "react-hook-form": "^6.15.1"
     },
     "scripts": {
         "start": "webpack serve --open",
@@ -17,9 +18,13 @@
         "@babel/preset-react": "^7.12.13",
         "@babel/preset-typescript": "^7.12.16",
         "@babel/runtime": "^7.12.13",
+        "@material-ui/core": "^4.11.3",
+        "@material-ui/icons": "^4.11.2",
         "@types/fork-ts-checker-webpack-plugin": "^0.4.5",
+        "@types/material-ui": "^0.21.8",
         "@types/react": "^17.0.2",
         "@types/react-dom": "^17.0.1",
+        "@types/react-tap-event-plugin": "^0.0.30",
         "@types/webpack": "^4.41.26",
         "@types/webpack-dev-server": "^3.11.1",
         "@typescript-eslint/eslint-plugin": "^4.15.0",

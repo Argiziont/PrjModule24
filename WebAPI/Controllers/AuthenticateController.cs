@@ -79,11 +79,6 @@ namespace WebAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response {Status = "Error", Message = "User already exists!"});
 
-            var role = await _roleManager.FindByNameAsync(model.Role);
-            if (role == null)
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
-                        {Status = "Error", Message = "Role was not found! Please check user details and try again."});
 
             var user = new ApplicationUser
             {
@@ -92,9 +87,9 @@ namespace WebAPI.Controllers
                 UserName = model.Username
             };
             var addResult = await _userManager.CreateAsync(user, model.Password);
+            
 
-            var roleResult = await _userManager.AddToRoleAsync(user, role.Name);
-            if (!addResult.Succeeded || !roleResult.Succeeded)
+            if (!addResult.Succeeded )
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new Response
                         {Status = "Error", Message = "User creation failed! Please check user details and try again."});
@@ -120,8 +115,7 @@ namespace WebAPI.Controllers
 //{
 // "Username": "SuperUser",
 // "Email": "user@example.com",
-// "Password": "SuperUser123$",
-// "Role": "Admin"
+// "Password": "SuperUser123$"
 //}
 
 //{
