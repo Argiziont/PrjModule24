@@ -12,7 +12,7 @@ import Checkbox from "@material-ui/core/Checkbox";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
-import { LoginRegisterProps } from "../../_services";
+import { ILoginRegisterProps } from "../../_services";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const RegisterPage: React.FC<LoginRegisterProps> = ({
+export const RegisterPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister,
 }) => {
   const classes = useStyles();

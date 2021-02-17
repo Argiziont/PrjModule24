@@ -1,3 +1,3 @@
-export interface LoginRegisterProps{
+export interface ILoginRegisterProps{
   setIsRegister: (value: boolean | ((prevVar: boolean) => boolean)) => void;
 }

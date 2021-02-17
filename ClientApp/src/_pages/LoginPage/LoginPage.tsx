@@ -14,7 +14,9 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
-import { LoginRegisterProps } from "../../_services";
+import { ILoginRegisterProps } from "../../_services";
+
+import { UserActions } from '../../_actions';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -36,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const LoninPage: React.FC<LoginRegisterProps> = ({
+export const LoginPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister
 }) => {
   const classes = useStyles();
@@ -56,6 +58,7 @@ export const LoninPage: React.FC<LoginRegisterProps> = ({
           noValidate
           onSubmit={handleSubmit((data) => {
             console.log(data);
+            UserActions.login(data.username, data.password);
             // userActions
             //   .login(data.username, data.password, SnackCallback)
             //   .then((response) => {
