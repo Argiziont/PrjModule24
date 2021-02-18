@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using JWTAuthenticationWithSwagger.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
 namespace WebAPI.Controllers
@@ -19,6 +23,9 @@ namespace WebAPI.Controllers
 
         [HttpGet]
         [Route("Users")]
+        [ProducesResponseType(typeof(List<ApplicationUser>),StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Get()
         {
             var users = await _dbContext.GetUsers();

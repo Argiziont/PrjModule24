@@ -38,8 +38,11 @@ namespace WebAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("User/Login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
-            {
+        {
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) return Unauthorized();
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -72,12 +75,15 @@ namespace WebAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("User/Register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response {Status = "Error", Message = "User already exists!"});
+                    new ApiResponse {Status = "Error", Message = "User already exists!"});
 
 
             var user = new ApplicationUser
@@ -90,7 +96,7 @@ namespace WebAPI.Controllers
 
             if (!addResult.Succeeded )
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
+                    new ApiResponse
                         {Status = "Error", Message = "User creation failed! Please check user details and try again."});
 
             await _dbContext.AddAccountAsync(new UserBankingAccount
@@ -106,7 +112,7 @@ namespace WebAPI.Controllers
                 Name = "NameTEMPLATE",
                 ApplicationUser = user
             });
-            return Ok(new Response {Status = "Success", Message = "User created successfully!"});
+            return Ok(new ApiResponse {Status = "Success", Message = "User created successfully!"});
         }
     }
 }

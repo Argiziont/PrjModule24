@@ -11,18 +11,18 @@ export const UserActions = {
 function login(
   username: string,
   password: string
-) {
-  return UserService.login(username, password).then(
-    (user) => {
-        History.push("/");
-      return user;
+):void {
+  UserService.login(username, password).then(
+    () => {
+      History.push("/");
+      //sucess handling
     },
-    (error) => {
-      return error;
+    () => {
+    //error handling
     }
   );
 }
-function logout() {
+function logout():void {
   UserService.logout();
   History.push("/Login");
 }

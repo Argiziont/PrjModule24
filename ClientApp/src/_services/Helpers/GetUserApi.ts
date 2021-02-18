@@ -1,12 +1,11 @@
-import { Client } from "../../_actions";
+import { AuthenticateClient } from "../../_actions";
 import {
   CreateAuthFetchApi,
   ApiUrl
 } from "../../_services";
 
-export const UserApi = (tokenHolder: string): Client => {
-  console.log("TEST");
-  return new Client(ApiUrl,
+export const UserApi = (tokenHolder: string): AuthenticateClient => {
+  return new AuthenticateClient(ApiUrl,
     CreateAuthFetchApi({
       Authorization: tokenHolder
     }));

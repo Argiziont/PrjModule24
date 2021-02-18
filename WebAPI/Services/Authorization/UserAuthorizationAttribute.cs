@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using WebAPI.Services.DataBase;
 
 namespace WebAPI.Services.Authorization
 {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class UserAuthorizationAttribute : Attribute, IAuthorizationFilter
     {
         private readonly IConfiguration _configuration;
@@ -25,6 +27,10 @@ namespace WebAPI.Services.Authorization
                 .AddJsonFile("appsettings.json");
             _configuration = builder.Build();
         }
+        /// <summary>
+        /// Gets or sets a comma delimited list of roles that are allowed to access the resource.
+        /// </summary>
+        public string Roles { get; set; }
 
         /// <summary>
         ///     This will Authorize User
@@ -32,6 +38,7 @@ namespace WebAPI.Services.Authorization
         /// <returns></returns>
         public void OnAuthorization(AuthorizationFilterContext filterContext)
         {
+
             if (filterContext == null) return;
             filterContext.HttpContext.Request.Headers.TryGetValue("Authorization", out var authTokens);
 
@@ -82,14 +89,22 @@ namespace WebAPI.Services.Authorization
             }
         }
 
-        public bool IsValidToken(string authToken)
+        private bool IsValidToken(string authToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = GetValidationParameters();
 
             SecurityToken validatedToken;
-            IPrincipal principal =
-                tokenHandler.ValidateToken(authToken.Split(' ')[1], validationParameters, out validatedToken);
+            try
+            {
+                IPrincipal principal =
+                    tokenHandler.ValidateToken(authToken.Split(' ')[1], validationParameters, out validatedToken);
+            }
+            catch
+            {
+                return false;
+            }
+          
             return true;
         }
 

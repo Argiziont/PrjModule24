@@ -13,15 +13,16 @@ export const UserService = {
   logout,
 };
 
-async function login(username: string, password: string) {
+async function login(username: string, password: string):Promise<void> {
 
-  try {
-    const userapi = UserApi("");
-
-    const response = await userapi.login(
-      new LoginModel({ username: username, password: password })
-    );
-    console.log(response);
+  return UserApi("").login(new LoginModel({ username: username, password: password })).then((success) => {
+    console.log("User logged in successgully");
+    return success;
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    console.log(handledException);
+    return error;
+  });
 //!!!!JSON.parse(tokenHolder).accessToken
   
     // const handledResponse = (await handleResponseBlob(
@@ -30,11 +31,6 @@ async function login(username: string, password: string) {
     // store user details and jwt token in local storage to keep user logged in between page refreshes
     //sessionStorage.setItem("user", JSON.stringify(handledResponse));
     //return handledResponse;
-  } catch (error) {
-    console.log(error);
-    //const exeption = await handleExeption(error);
-   // return exeption;
-  }
 }
 
 function logout():void {

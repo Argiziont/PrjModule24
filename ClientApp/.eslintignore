@@ -1,4 +1,4 @@
 !.eslintrc.js
 documentation/
 build/
-src/_actions/
+src/_actions/ClientActions.ts

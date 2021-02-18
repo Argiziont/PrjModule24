@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -10,10 +11,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+//using Microsoft.OpenApi.Models;
+using NSwag.Generation.Processors.Security;
+using NSwag;
 using Newtonsoft.Json;
 using WebAPI.Models;
 using WebAPI.Services.DataBase;
 using WebAPI.Services.Interfaces;
+//using OpenApiInfo = NSwag.OpenApiInfo;
+//using OpenApiSecurityRequirement = NSwag.OpenApiSecurityRequirement;
+//using OpenApiSecurityScheme = NSwag.OpenApiSecurityScheme;
 
 namespace WebAPI
 {
@@ -68,35 +75,54 @@ namespace WebAPI
                 };
             });
 
-            services.AddSwaggerGen(swagger =>
+            services.AddOpenApiDocument(document =>
             {
-                swagger.SwaggerDoc("v1", new OpenApiInfo {Title = "WebAPI", Version = "v1"});
-                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description =
-                        "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
-                });
-                //Swagger bearer authorization
-                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
-                    }
-                });
+                document.OperationProcessors.Add(
+                    new AspNetCoreOperationSecurityScopeProcessor("JWT"));
+                document.AddSecurity("JWT", Enumerable.Empty<string>(), new NSwag.OpenApiSecurityScheme
+               {
+                   Type = OpenApiSecuritySchemeType.ApiKey,
+                   Name = "Authorization",
+                   Scheme = "Bearer",
+                   BearerFormat = "JWT",
+                   In = OpenApiSecurityApiKeyLocation.Header,
+                   Description = "Type into the textbox: Bearer {your JWT token}."
+               });
             });
+
+            #region 1
+
+            //services.AddSwaggerGen(swagger =>
+            //{
+            //    swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
+            //    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            //    {
+            //        Name = "Authorization",
+            //        Type = SecuritySchemeType.ApiKey,
+            //        Scheme = "Bearer",
+            //        BearerFormat = "JWT",
+            //        In = ParameterLocation.Header,
+            //        Description =
+            //            "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
+            //    });
+            //    //Swagger bearer authorization
+            //    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+            //    {
+            //        {
+            //            new OpenApiSecurityScheme
+            //            {
+            //                Reference = new OpenApiReference
+            //                {
+            //                    Type = ReferenceType.SecurityScheme,
+            //                    Id = "Bearer"
+            //                }
+            //            },
+            //            Array.Empty<string>()
+            //        }
+            //    });
+            //});
+
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -105,17 +131,27 @@ namespace WebAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPI v1"));
+                app.UseOpenApi();
+
+                app.UseOpenApi();
+                app.UseSwaggerUi3();
+                //app.UseSwagger();
+                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPI v1"));
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-            
-            app.UseCors(builder => builder.AllowAnyOrigin());
-            
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()
+                .WithExposedHeaders("Content-Disposition")); // allow credentials
+
             app.UseAuthentication();
             app.UseAuthorization();
 

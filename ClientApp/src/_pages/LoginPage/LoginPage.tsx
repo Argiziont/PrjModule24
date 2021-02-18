@@ -57,7 +57,7 @@ export const LoginPage: React.FC<ILoginRegisterProps> = ({
           className={classes.form}
           noValidate
           onSubmit={handleSubmit((data) => {
-            console.log(data);
+            //console.log(data);
             UserActions.login(data.username, data.password);
             // userActions
             //   .login(data.username, data.password, SnackCallback)

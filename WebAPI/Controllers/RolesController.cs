@@ -22,42 +22,45 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost(nameof(Create))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> Create(string name)
         {
             if (string.IsNullOrEmpty(name))
-                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                return BadRequest( new ApiResponse
                     {Status = "Error", Message = "Role create failed! Please check user details and try again."});
 
             var result = await _roleManager.CreateAsync(new IdentityRole(name));
             if (result.Succeeded)
-                return StatusCode(StatusCodes.Status200OK,
-                    new Response {Message = "Role created successfully", Status = "Success"});
+                return Ok();
 
             foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
 
-            return StatusCode(StatusCodes.Status500InternalServerError, new Response
+            return BadRequest(new ApiResponse
                 {Status = "Error", Message = "Role create failed! Please check user details and try again." });
         }
 
         [HttpPost(nameof(DeleteWithId))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> DeleteWithId(string id)
         {
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
+                return BadRequest(new ApiResponse
                         {Status = "Error", Message = "Role delete failed! Please check user details and try again."});
 
             var result = await _roleManager.DeleteAsync(role);
             if (!result.Succeeded)
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response
+                return BadRequest(new ApiResponse
                         {Status = "Error", Message = "Role delete failed! Please check user details and try again."});
 
-            return StatusCode(StatusCodes.Status200OK,
-                new Response {Message = "Role deleted successfully", Status = "Success"});
+            return Ok();
         }
-
+        [ProducesResponseType(typeof(IdentityRole[]),StatusCodes.Status200OK)]
+        [ProducesDefaultResponseType]
         [HttpGet(nameof(GetRoles))]
         public async Task<IActionResult> GetRoles()
         {
