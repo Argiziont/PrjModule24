@@ -1,4 +1,4 @@
-﻿namespace JWTAuthenticationWithSwagger.Authentication
+﻿namespace WebAPI.Models.Authenticate_Models
 {
     public class ApiResponse
     {

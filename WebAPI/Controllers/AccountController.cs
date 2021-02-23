@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
 using System.Threading.Tasks;
-using JWTAuthenticationWithSwagger.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Models.Authenticate_Models;
 using WebAPI.Services.Extensions;
 using WebAPI.Services.Interfaces;
 

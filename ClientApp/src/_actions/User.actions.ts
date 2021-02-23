@@ -14,8 +14,8 @@ function login(
 ):void {
   UserService.login(username, password).then(
     () => {
-      History.push("/");
-      //sucess handling
+      History.push('/');
+      window.location.reload();
     },
     () => {
     //error handling

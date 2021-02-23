@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,17 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-//using Microsoft.OpenApi.Models;
 using NSwag.Generation.Processors.Security;
 using NSwag;
 using Newtonsoft.Json;
 using WebAPI.Models;
 using WebAPI.Services.DataBase;
 using WebAPI.Services.Interfaces;
-//using OpenApiInfo = NSwag.OpenApiInfo;
-//using OpenApiSecurityRequirement = NSwag.OpenApiSecurityRequirement;
-//using OpenApiSecurityScheme = NSwag.OpenApiSecurityScheme;
 
 namespace WebAPI
 {

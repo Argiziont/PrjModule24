@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using JWTAuthenticationWithSwagger.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -24,21 +23,19 @@ namespace WebAPI.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IEfFileFolderContext _dbContext;
-        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AuthenticateController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager,
+        public AuthenticateController(UserManager<ApplicationUser> userManager,
             IConfiguration configuration, IEfFileFolderContext dbContext)
         {
             _userManager = userManager;
             _configuration = configuration;
             _dbContext = dbContext;
-            _roleManager = roleManager;
         }
 
         [AllowAnonymous]
         [HttpPost("User/Login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
@@ -66,10 +63,10 @@ namespace WebAPI.Controllers
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            return Ok(new
+            return Ok(new UserResponse
             {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
+                Token= new JwtSecurityTokenHandler().WriteToken(token),
+                ExpirationDate = token.ValidTo
             });
         }
 
@@ -113,6 +110,20 @@ namespace WebAPI.Controllers
                 ApplicationUser = user
             });
             return Ok(new ApiResponse {Status = "Success", Message = "User created successfully!"});
+        }
+
+        [AllowAnonymous]
+        [HttpGet("User/TryLogin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
+        public IActionResult TryLogin()
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return Ok();
+            }
+            return Unauthorized();
         }
     }
 }

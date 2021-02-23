@@ -500,7 +500,7 @@ export class ApplicationUserClient {
         }
     }
 
-    getWithId(id: string | null): Promise<FileResponse> {
+    getWithId(id: string | null): Promise<void> {
         let url_ = this.baseUrl + "/User/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -510,7 +510,6 @@ export class ApplicationUserClient {
         let options_ = <RequestInit>{
             method: "GET",
             headers: {
-                "Accept": "application/octet-stream"
             }
         };
 
@@ -519,20 +518,28 @@ export class ApplicationUserClient {
         });
     }
 
-    protected processGetWithId(response: Response): Promise<FileResponse> {
+    protected processGetWithId(response: Response): Promise<void> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
-        } else if (status !== 200 && status !== 204) {
+        if (status === 200) {
             return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return;
+            });
+        } else if (status === 404) {
+            return response.text().then((_responseText) => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            });
+        } else {
+            return response.text().then((_responseText) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
             });
         }
-        return Promise.resolve<FileResponse>(<any>null);
     }
 }
 
@@ -546,7 +553,7 @@ export class AuthenticateClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "http://localhost:5001";
     }
 
-    login(model: LoginModel): Promise<void> {
+    login(model: LoginModel): Promise<UserResponse> {
         let url_ = this.baseUrl + "/User/Login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -557,6 +564,7 @@ export class AuthenticateClient {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             }
         };
 
@@ -565,12 +573,15 @@ export class AuthenticateClient {
         });
     }
 
-    protected processLogin(response: Response): Promise<void> {
+    protected processLogin(response: Response): Promise<UserResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-            return;
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserResponse.fromJS(resultData200);
+            return result200;
             });
         } else if (status === 401) {
             return response.text().then((_responseText) => {
@@ -631,6 +642,45 @@ export class AuthenticateClient {
             });
         }
     }
+
+    tryLogin(): Promise<void> {
+        let url_ = this.baseUrl + "/User/TryLogin";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processTryLogin(_response);
+        });
+    }
+
+    protected processTryLogin(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status === 401) {
+            return response.text().then((_responseText) => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
+            });
+        } else {
+            return response.text().then((_responseText) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            });
+        }
+    }
 }
 
 export class RolesClient {
@@ -643,7 +693,7 @@ export class RolesClient {
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "http://localhost:5001";
     }
 
-    create(name?: string | null | undefined): Promise<void> {
+    create(name: string | null | undefined): Promise<void> {
         let url_ = this.baseUrl + "/Roles/Create?";
         if (name !== undefined && name !== null)
             url_ += "name=" + encodeURIComponent("" + name) + "&";
@@ -684,7 +734,7 @@ export class RolesClient {
         }
     }
 
-    deleteWithId(id?: string | null | undefined): Promise<void> {
+    deleteWithId(id: string | null | undefined): Promise<void> {
         let url_ = this.baseUrl + "/Roles/DeleteWithId?";
         if (id !== undefined && id !== null)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
@@ -1134,6 +1184,46 @@ export interface IUserBankingAccount {
     applicationUser?: ApplicationUser | undefined;
 }
 
+export class UserResponse implements IUserResponse {
+    token?: string | undefined;
+    expirationDate?: Date;
+
+    constructor(data?: IUserResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.token = _data["token"];
+            this.expirationDate = _data["expirationDate"] ? new Date(_data["expirationDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): UserResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["token"] = this.token;
+        data["expirationDate"] = this.expirationDate ? this.expirationDate.toISOString() : <any>undefined;
+        return data; 
+    }
+}
+
+export interface IUserResponse {
+    token?: string | undefined;
+    expirationDate?: Date;
+}
+
 export class LoginModel implements ILoginModel {
     username!: string;
     password!: string;
@@ -1291,13 +1381,6 @@ export class IdentityRole extends IdentityRoleOfString implements IIdentityRole 
 }
 
 export interface IIdentityRole extends IIdentityRoleOfString {
-}
-
-export interface FileResponse {
-    data: Blob;
-    status: number;
-    fileName?: string;
-    headers?: { [name: string]: any };
 }
 
 export class ApiException extends Error {

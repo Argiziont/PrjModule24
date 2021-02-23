@@ -15,22 +15,15 @@ export const UserService = {
 
 async function login(username: string, password: string):Promise<void> {
 
-  return UserApi("").login(new LoginModel({ username: username, password: password })).then((success) => {
+  return UserApi("").login(new LoginModel({ username: username, password: password })).then((userResponse) => {
     console.log("User logged in successgully");
-    return success;
+    localStorage.setItem("User", JSON.stringify(userResponse));
+    return userResponse;
   }, async (error) => {
     const handledException = await handleExeption(error);
     console.log(handledException);
     return error;
   });
-//!!!!JSON.parse(tokenHolder).accessToken
-  
-    // const handledResponse = (await handleResponseBlob(
-    //   response
-    // )) as IUserSubscribe;
-    // store user details and jwt token in local storage to keep user logged in between page refreshes
-    //sessionStorage.setItem("user", JSON.stringify(handledResponse));
-    //return handledResponse;
 }
 
 function logout():void {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
-//import { LoginPrivateRoute } from "../../_components";
+import { LoginPrivateRoute } from "../../_components";
 import { LoginPage } from "../LoginPage";
 import { RegisterPage } from "../RegisterPage";
 import { HomePage } from "../HomePage";
@@ -13,7 +13,7 @@ export const AppPage: React.FC = () => {
   return (
     <Router >
     <Switch>  
-    <Route exact path="/" component={() => (<HomePage></HomePage>)} />
+    <LoginPrivateRoute exact path="/" component={() => (<HomePage></HomePage>)} />
     <Route exact path="/Login" component={() => (<LoginPage setIsRegister={setIsRegister} ></LoginPage>)} />
     <Route exact path="/Register" component={() => (<RegisterPage setIsRegister={setIsRegister}></RegisterPage>)} />
     </Switch>

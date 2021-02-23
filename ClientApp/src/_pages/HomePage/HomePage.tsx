@@ -1,6 +1,4 @@
 import React from "react";
-// import { useForm, Controller } from "react-hook-form";
-// import { History } from "../../_services";
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -8,10 +6,7 @@ import TextField from '@material-ui/core/TextField';
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-//import Input from '@material-ui/core/Input';
-//import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-//import FormControl from '@material-ui/core/FormControl';
 import VerifiedUser from "@material-ui/icons/VerifiedUser";
 import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
@@ -47,14 +42,14 @@ const useStyles = makeStyles((theme) => ({
   },
   inputLabel: {
     margin: theme.spacing(5),
-    // width: "100%",
-    // height:"200%",  
   },
   inputButton: {
-    //margin: theme.spacing(5),
      width: "100%",
      height:"200%",  
   },
+  typography: {
+    marginBottom: theme.spacing(5),
+  }
 }));
 
 export const HomePage: React.FC = () => {
@@ -66,24 +61,13 @@ export const HomePage: React.FC = () => {
         <Avatar className={classes.avatar}>
           <VerifiedUser className={classes.userIcon}/>
         </Avatar>
-        <Typography component="h1" variant="h5">
+        
+        <Typography component="h1" variant="h5" className={classes.typography}>
           Successfully logged in
         </Typography>
-        <FormControlLabel
-        control={
-            <Switch
-            size="medium"
-            // checked={state.checkedB}
-            // onChange={handleChange}
-            name="AccountOpenState"
-            color="primary"
-          />
-        }
-        label="Account state"
-      />
         
          <div className={classes.root}>
-      <Grid container spacing={3} >
+      <Grid container spacing={4} justify="center">
         <Grid item xs={12}>
             <TextField
           variant="outlined"
@@ -145,7 +129,21 @@ export const HomePage: React.FC = () => {
                 Submit
               </Typography>
         </Button>
-        </Grid>
+            </Grid>      
+        <Grid item>
+            <FormControlLabel
+        control={
+            <Switch
+            size="medium"
+            // checked={state.checkedB}
+            // onChange={handleChange}
+            name="AccountOpenState"
+            color="primary"
+          />
+        }
+        label="Account state"
+      />
+            </Grid>
       </Grid>
         </div>
         
