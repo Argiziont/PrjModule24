@@ -1,4 +1,5 @@
 import React from "react";
+
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -12,6 +13,16 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import Link from "@material-ui/core/Link";
+import { UserActions } from '../../_actions';
+import { useEffect } from "react";
+import {
+  UserResponse
+} from "../../_actions";
+
+import {
+  UserApi
+} from "../../_services";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,6 +65,37 @@ const useStyles = makeStyles((theme) => ({
 
 export const HomePage: React.FC = () => {
   const classes = useStyles();
+  //TODO
+  
+  useEffect(() => {
+    let isMounted = true;
+
+    
+       if (localStorage.getItem("User")) {
+         const userResponse:UserResponse = JSON.parse(localStorage.getItem("User") || '{}');
+         const token = userResponse.token || "";
+         
+        UserApi(token).tryLogin().then(() => {
+          if (isMounted) {
+            setisSuccess(true);
+            setIsLodaing(false);
+          }
+        }, () => {
+          if (isMounted) {
+            setisSuccess(false);
+            setIsLodaing(false);
+          }
+          });
+       }
+       else {
+         if (isMounted) {
+          setisSuccess(false);
+          setIsLodaing(false);}
+       }
+      
+    return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
+  }, []);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -61,7 +103,7 @@ export const HomePage: React.FC = () => {
         <Avatar className={classes.avatar}>
           <VerifiedUser className={classes.userIcon}/>
         </Avatar>
-        
+
         <Typography component="h1" variant="h5" className={classes.typography}>
           Successfully logged in
         </Typography>
@@ -135,14 +177,21 @@ export const HomePage: React.FC = () => {
         control={
             <Switch
             size="medium"
-            // checked={state.checkedB}
-            // onChange={handleChange}
             name="AccountOpenState"
             color="primary"
           />
         }
         label="Account state"
       />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <Link href="#" variant="body2" onClick={
+                () => {
+                  UserActions.logout();
+                }}
+              >
+                {"Want to exit? Log out"}
+              </Link>
             </Grid>
       </Grid>
         </div>
