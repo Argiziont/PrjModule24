@@ -27,7 +27,7 @@ async function login(username: string, password: string):Promise<void> {
 }
 
 function logout():void {
-  localStorage.removeItem("user");
+  localStorage.removeItem("User");
 }
 async function handleExeption(error: ApiException) {
   if (error.status === 401 && error.response === "Unauthorized") {

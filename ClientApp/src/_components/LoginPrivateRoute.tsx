@@ -5,6 +5,10 @@ import { Route, Redirect, RouteProps } from "react-router-dom";
 import {
   UserApi
 } from "../_services";
+import {
+  UserResponse
+} from "../_actions";
+
 interface LoginPrivateRouteProps extends RouteProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: any;
@@ -21,7 +25,9 @@ export const LoginPrivateRoute = (props: LoginPrivateRouteProps): ReactElement =
 
     
        if (localStorage.getItem("User")) {
-        const token = JSON.parse(localStorage.getItem("User") || '{}').token;
+         const userResponse:UserResponse = JSON.parse(localStorage.getItem("User") || '{}');
+         const token = userResponse.token || "";
+         
         UserApi(token).tryLogin().then(() => {
           if (isMounted) {
             setisSuccess(true);

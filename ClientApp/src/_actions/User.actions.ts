@@ -25,4 +25,5 @@ function login(
 function logout():void {
   UserService.logout();
   History.push("/Login");
+  window.location.reload();
 }
