@@ -5,17 +5,19 @@ import {
 
 import {
   ApiException,
-  LoginModel
+  LoginModel,
+  RegisterModel,
 } from "../_actions";
 
 export const UserService = {
   login,
   logout,
+  register
 };
 
-async function login(username: string, password: string):Promise<void> {
+async function login(userModel:LoginModel):Promise<void> {
 
-  return UserApi("").login(new LoginModel({ username: username, password: password })).then((userResponse) => {
+  return UserApi("").login(userModel).then((userResponse) => {
     console.log("User logged in successgully");
     localStorage.setItem("User", JSON.stringify(userResponse));
     return userResponse;
@@ -28,6 +30,16 @@ async function login(username: string, password: string):Promise<void> {
 
 function logout():void {
   localStorage.removeItem("User");
+}
+
+function register(userModel:RegisterModel):Promise<void>  {
+  return UserApi("").register(userModel).then(() => {
+    console.log("User logged in successgully");
+  }, async (error) => {
+    const handledException = await handleExeption(error);
+    console.log(handledException);
+    return error;
+   });
 }
 async function handleExeption(error: ApiException) {
   if (error.status === 401 && error.response === "Unauthorized") {

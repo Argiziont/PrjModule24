@@ -16,7 +16,7 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import { ILoginRegisterProps } from "../../_services";
 
-import { UserActions } from '../../_actions';
+import { LoginModel, UserActions } from '../../_actions';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,13 +57,11 @@ export const LoginPage: React.FC<ILoginRegisterProps> = ({
           className={classes.form}
           noValidate
           onSubmit={handleSubmit((data) => {
-            //console.log(data);
-            UserActions.login(data.username, data.password);
-            // userActions
-            //   .login(data.username, data.password, SnackCallback)
-            //   .then((response) => {
-            //     //setConnected(true);
-            //   });
+            const loginData = new LoginModel({
+              password:data.password,
+              username: data.username
+            });
+            UserActions.login(loginData);
           })}
         >
           <TextField
