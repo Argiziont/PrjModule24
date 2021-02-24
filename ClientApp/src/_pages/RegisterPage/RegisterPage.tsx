@@ -19,6 +19,13 @@ import { ILoginRegisterProps } from "../../_services";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
 
+type RegisterInputs = {
+  password: string,
+  username: string,
+  email: string,
+  repeatPassword:string
+};
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -43,7 +50,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister,
 }) => {
   const classes = useStyles();
-  const { register, handleSubmit,watch, control, errors } = useForm();
+  const { register, handleSubmit,watch, control, errors } = useForm<RegisterInputs>();
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -64,7 +71,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
               username: data.username
             });
 
-            UserActions.
+            UserActions.register(registerData);
             // userActions
             //   .login(data.username, data.password, SnackCallback)
             //   .then((response) => {
