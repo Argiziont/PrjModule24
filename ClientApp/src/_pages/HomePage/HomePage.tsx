@@ -77,20 +77,21 @@ export const HomePage: React.FC = () => {
          
         UserApi(token).tryLogin().then(() => {
           if (isMounted) {
-            setisSuccess(true);
-            setIsLodaing(false);
+            // setisSuccess(true);
+            // setIsLodaing(false);
           }
         }, () => {
           if (isMounted) {
-            setisSuccess(false);
-            setIsLodaing(false);
+            // setisSuccess(false);
+            // setIsLodaing(false);
           }
           });
        }
        else {
          if (isMounted) {
-          setisSuccess(false);
-          setIsLodaing(false);}
+          //  setisSuccess(false);
+          //  setIsLodaing(false);
+         }
        }
       
     return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
