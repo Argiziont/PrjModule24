@@ -1,6 +1,9 @@
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 import { History } from "../../_services";
+import {
+  RegisterModel, UserActions
+} from "../../_actions"
 
 import { makeStyles } from "@material-ui/core/styles";
 import Avatar from "@material-ui/core/Avatar";
@@ -40,7 +43,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister,
 }) => {
   const classes = useStyles();
-  const { register, handleSubmit, control, errors } = useForm();
+  const { register, handleSubmit,watch, control, errors } = useForm();
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -55,7 +58,13 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
           className={classes.form}
           noValidate
           onSubmit={handleSubmit((data) => {
-            console.log(data);
+            const registerData = new RegisterModel({
+              email:data.email,
+              password:data.password,
+              username: data.username
+            });
+
+            UserActions.
             // userActions
             //   .login(data.username, data.password, SnackCallback)
             //   .then((response) => {
@@ -112,7 +121,10 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
           <TextField
             variant="outlined"
             margin="normal"
-            inputRef={register({ required: true })}
+            inputRef={register({
+              required:true,
+              validate: (value) => value === watch('password')
+            })}
             required
             fullWidth
             name="repeatPassword"
@@ -122,7 +134,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
             type="password"
             autoComplete="current-password"
             error={errors.repeatPassword && true}
-            helperText={errors.repeatPassword && "*Password repeat is required"}
+            helperText={errors.repeatPassword && "*Passwords must be equal"}
           />
           <FormControlLabel
             control={
