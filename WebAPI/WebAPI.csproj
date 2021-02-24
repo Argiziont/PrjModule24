@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Middleware\**" />
+    <Content Remove="Services\Middleware\**" />
+    <EmbeddedResource Remove="Services\Middleware\**" />
+    <None Remove="Services\Middleware\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LanguageExt.Core" Version="3.4.15" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.3" NoWarn="NU1605" />
@@ -32,10 +39,6 @@
     <PackageReference Include="NSwag.Generation.AspNetCore" Version="13.10.3" />
     <PackageReference Include="NSwag.SwaggerGeneration" Version="12.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Middleware\" />
   </ItemGroup>
 
 </Project>
