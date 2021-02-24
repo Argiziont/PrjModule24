@@ -17,6 +17,10 @@ import Container from "@material-ui/core/Container";
 import { ILoginRegisterProps } from "../../_services";
 
 import { LoginModel, UserActions } from '../../_actions';
+type LoginInputs = {
+  password: string,
+  username: string,
+};
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,7 +46,7 @@ export const LoginPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister
 }) => {
   const classes = useStyles();
-  const { register, handleSubmit, control, errors } = useForm();
+  const { register, handleSubmit, control, errors } = useForm<LoginInputs>();
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
