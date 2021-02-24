@@ -85,6 +85,21 @@ namespace WebAPI.Controllers
                 () => BadRequest(new ApiResponse { Message = "Couldn't close account", Status = "Error" }));
         }
 
+        [Authorize(Roles = "Admin,Moderator,User")]
+        [HttpGet]
+        [Route("GetState")]
+        [ProducesResponseType(typeof(ApiResponse),StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetAccountState()
+        {
+            var userId = User.GetLoggedInUserId<string>();
+            var account = await _db.GetAccountAsync(userId);
+            return account.Match<IActionResult>(
+                acc => Ok(new ApiResponse {Status = "Success", Message = acc.State.ToString()}),
+                BadRequest(new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
+        }
+
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Deposit={amount}")]

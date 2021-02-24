@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { makeStyles } from "@material-ui/core/styles";
@@ -16,13 +16,7 @@ import Switch from '@material-ui/core/Switch';
 import Link from "@material-ui/core/Link";
 import { UserActions } from '../../_actions';
 import { useEffect } from "react";
-import {
-  UserResponse
-} from "../../_actions";
-
-import {
-  UserApi
-} from "../../_services";
+import NumberFormat from 'react-number-format';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,39 +59,63 @@ const useStyles = makeStyles((theme) => ({
 
 export const HomePage: React.FC = () => {
   const classes = useStyles();
-  //TODO
+  const [userBalance, setUserBalance] = useState<string>();
+  const [isLodaing, setIsLodaing] = useState<boolean>(true);
+  const [amountForDeposit, setAmountForDeposit] = useState<number>();
+  const [amountForWithdrawal, setAmountForWithdrawal] = useState<number>();
+
+  const [userAccountState, setUserAccountState] = useState<boolean>(true);
   
+  interface NumberFormatCustomProps {
+    inputRef: (instance: NumberFormat | null) => void;
+    onChange: (event: { target: { name: string; value: string } }) => void;
+    name: string;
+  }
+  
+  function NumberFormatCustom(props: NumberFormatCustomProps) {
+    const { inputRef, onChange, ...other } = props;
+  
+    return (
+      <NumberFormat
+        {...other}
+        getInputRef={inputRef}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        isNumericString
+      />
+    );
+  }
+
+  const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountForDeposit(Number(event.target.value));
+  };
+
   useEffect(() => {
     let isMounted = true;
-
+    setIsLodaing(true);
     
-       if (localStorage.getItem("User")) {
-         const userResponse:UserResponse = JSON.parse(localStorage.getItem("User") || '{}');
-         const token = userResponse.token || "";
-         
-        UserApi(token).tryLogin().then(() => {
-          if (isMounted) {
-            // setisSuccess(true);
-            // setIsLodaing(false);
-          }
-        }, () => {
-          if (isMounted) {
-            // setisSuccess(false);
-            // setIsLodaing(false);
-          }
-          });
-       }
-       else {
-         if (isMounted) {
-          //  setisSuccess(false);
-          //  setIsLodaing(false);
-         }
-       }
-      
+    UserActions.getBalance().then((moneyAmount) => {
+      if (isMounted) {
+        setUserBalance(moneyAmount);
+      }
+      UserActions.getState().then((state) => {
+        if (isMounted) {
+          setUserAccountState(state == "True" ? true : false);
+          setIsLodaing(false);
+        }
+      });
+    });      
     return () => { isMounted = false }; // use effect cleanup to set flag false, if unmounted
   }, []);
 
-  return (
+  return isLodaing?(<div></div>):(
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
@@ -110,7 +128,7 @@ export const HomePage: React.FC = () => {
         </Typography>
         
          <div className={classes.root}>
-      <Grid container spacing={4} justify="center">
+          <Grid container spacing={4} justify="center">
         <Grid item xs={12}>
             <TextField
           variant="outlined"
@@ -121,7 +139,7 @@ export const HomePage: React.FC = () => {
             <InputAdornment position="start">
               <MonetizationOnIcon />
               <Typography component="h1" variant="body1"   className={classes.margin}>
-                1000
+                {userBalance}
               </Typography>
             </InputAdornment>
           ),
@@ -129,12 +147,18 @@ export const HomePage: React.FC = () => {
           }}
           />
         </Grid>  
+        
         <Grid item xs={12} sm={6}>
         <TextField
-          variant="outlined"
+        variant="outlined"
         id="outlined-size-small"
-        label="Money for deposit"
-        InputProps={{
+                label="amountForDeposit"
+                name="amountForDeposit"
+                value={amountForDeposit}
+        onChange={handleDepositChange}
+                InputProps={{
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  inputComponent: NumberFormatCustom as any,
           startAdornment: (
             <InputAdornment position="start">
               <MonetizationOnIcon />
@@ -143,19 +167,28 @@ export const HomePage: React.FC = () => {
           )
           }}
           />
+          
         </Grid>
-        <Grid item xs={12} sm={6}>
-              <Button size="large" variant="contained" >
+              <Grid item xs={12} sm={6}>
+              <Button size="large" variant="contained" onClick={async () => {
+                await UserActions.depositToAccount(amountForDeposit || 0);
+
+                UserActions.getBalance().then((moneyAmount) => {
+                  setUserBalance(moneyAmount);
+                });
+                setAmountForDeposit(0);
+              
+              }}>
               <Typography component="h1" variant="body1"   className={classes.margin}>
                 Submit
               </Typography>
         </Button>
             </Grid>
-        <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
         <TextField
           variant="outlined"
         id="outlined-size-small"
-        label="Money for withdrawal"
+        label="amountForwithdrawal"
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -166,26 +199,39 @@ export const HomePage: React.FC = () => {
           }}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        
+              <Grid item xs={12} sm={6}>
               <Button size="large" variant="contained" >
               <Typography component="h1" variant="body1"   className={classes.margin}>
                 Submit
               </Typography>
         </Button>
-            </Grid>      
+              </Grid>
         <Grid item>
             <FormControlLabel
         control={
-            <Switch
-            size="medium"
-            name="AccountOpenState"
-            color="primary"
+                  <Switch
+                    size="medium"
+                    name="AccountOpenState"
+                    color="primary"
+                    checked={userAccountState}
+                    onChange={async () => {
+                      
+                      if (userAccountState) {
+                        await UserActions.closeAccount();
+                      }
+                      if (!userAccountState){
+                        await UserActions.openAccount();
+                      }
+                      
+                      setUserAccountState(!userAccountState);
+                    }}
           />
         }
         label="Account state"
       />
             </Grid>
-            <Grid item xs={12} sm={12}>
+        <Grid item xs={12} sm={12}>
               <Link href="#" variant="body2" onClick={
                 () => {
                   UserActions.logout();
@@ -201,3 +247,4 @@ export const HomePage: React.FC = () => {
     </Container>
   );
 };
+

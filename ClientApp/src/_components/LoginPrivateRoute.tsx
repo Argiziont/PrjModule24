@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { Route, Redirect, RouteProps } from "react-router-dom";
 import {
-  UserApi
+  UserAuthApi
 } from "../_services";
 import {
   UserResponse
@@ -28,7 +28,7 @@ export const LoginPrivateRoute = (props: LoginPrivateRouteProps): ReactElement =
          const userResponse:UserResponse = JSON.parse(localStorage.getItem("User") || '{}');
          const token = userResponse.token || "";
          
-        UserApi(token).tryLogin().then(() => {
+         UserAuthApi(token).tryLogin().then(() => {
           if (isMounted) {
             setisSuccess(true);
             setIsLodaing(false);

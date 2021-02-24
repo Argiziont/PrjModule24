@@ -179,6 +179,49 @@ export class AccountClient {
         }
     }
 
+    getAccountState(): Promise<ApiResponse> {
+        let url_ = this.baseUrl + "/User/GetState";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ = <RequestInit>{
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetAccountState(_response);
+        });
+    }
+
+    protected processGetAccountState(response: Response): Promise<ApiResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ApiResponse.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status === 500) {
+            return response.text().then((_responseText) => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = ApiResponse.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            });
+        } else {
+            return response.text().then((_responseText) => {
+            let resultdefault: any = null;
+            let resultDatadefault = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            resultdefault = ProblemDetails.fromJS(resultDatadefault);
+            return throwException("A server side error occurred.", status, _responseText, _headers, resultdefault);
+            });
+        }
+    }
+
     depositMoneyToAccountWithId(id: string | null, amount: number): Promise<void> {
         let url_ = this.baseUrl + "/User/{id}/Deposit={amount}";
         if (id === undefined || id === null)

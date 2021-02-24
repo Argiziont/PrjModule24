@@ -25,6 +25,7 @@ namespace WebAPI.Controllers
         private readonly IEfFileFolderContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
+
         public AuthenticateController(UserManager<ApplicationUser> userManager,
             IConfiguration configuration, IEfFileFolderContext dbContext)
         {
@@ -89,12 +90,26 @@ namespace WebAPI.Controllers
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };
+
             var addResult = await _userManager.CreateAsync(user, model.Password);
 
-            if (!addResult.Succeeded )
+            if (!addResult.Succeeded)
+            {
+                var errors= addResult.Errors.Aggregate("", (current, error) => current + ("Code: "+error.Code+"\nDescription: " + error.Description + "\n"));
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new ApiResponse
-                        {Status = "Error", Message = "User creation failed! Please check user details and try again."});
+                        { Status = "Error", Message = errors });
+            }
+
+            var addRoleAsyncResult= await _userManager.AddToRoleAsync(user, "User");
+
+            if (!addRoleAsyncResult.Succeeded)
+            {
+                var errors = addRoleAsyncResult.Errors.Aggregate("", (current, error) => current + ("Code: " + error.Code + "\nDescription: " + error.Description + "\n"));
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new ApiResponse
+                    { Status = "Error", Message = errors });
+            }
 
             await _dbContext.AddAccountAsync(new UserBankingAccount
             {
@@ -109,6 +124,7 @@ namespace WebAPI.Controllers
                 Name = "NameTEMPLATE",
                 ApplicationUser = user
             });
+
             return Ok(new ApiResponse {Status = "Success", Message = "User created successfully!"});
         }
 
