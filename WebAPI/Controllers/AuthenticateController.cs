@@ -24,8 +24,6 @@ namespace WebAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IEfFileFolderContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
-
-
         public AuthenticateController(UserManager<ApplicationUser> userManager,
             IConfiguration configuration, IEfFileFolderContext dbContext)
         {

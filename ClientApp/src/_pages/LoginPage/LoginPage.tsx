@@ -16,10 +16,10 @@ import Typography from "@material-ui/core/Typography";
 import Container from "@material-ui/core/Container";
 import { ILoginRegisterProps } from "../../_services";
 
-import { LoginModel, UserActions } from '../../_actions';
+import { LoginModel, UserActions } from "../../_actions";
 type LoginInputs = {
-  password: string,
-  username: string,
+  password: string;
+  username: string;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -42,11 +42,23 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const LoginPage: React.FC<ILoginRegisterProps> = ({
-  setIsRegister
-}) => {
+export const LoginPage: React.FC<ILoginRegisterProps> = ({ setIsRegister }) => {
   const classes = useStyles();
   const { register, handleSubmit, control, errors } = useForm<LoginInputs>();
+
+  const onLoginSubmit =async(data:LoginInputs)  => {
+      const loginData = new LoginModel({
+        password: data.password,
+        username: data.username,
+      });
+      await UserActions.login(loginData);
+  };
+
+  const onRegisterRedirectClick = () => {
+    setIsRegister(true);
+    History.push("/Register");
+  };
+  //async()=>await onSubmitClick()
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -57,17 +69,7 @@ export const LoginPage: React.FC<ILoginRegisterProps> = ({
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form
-          className={classes.form}
-          noValidate
-          onSubmit={handleSubmit((data) => {
-            const loginData = new LoginModel({
-              password:data.password,
-              username: data.username
-            });
-            UserActions.login(loginData);
-          })}
-        >
+        <form className={classes.form} noValidate onSubmit={handleSubmit((data)=>{onLoginSubmit(data)})}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -122,12 +124,7 @@ export const LoginPage: React.FC<ILoginRegisterProps> = ({
           <Grid container>
             <Grid item xs></Grid>
             <Grid item>
-              <Link href="#" variant="body2" onClick={
-                () => {
-                  setIsRegister(true);
-                  History.push('/Register');
-                }}
-              >
+              <Link href="#" variant="body2" onClick={onRegisterRedirectClick}>
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

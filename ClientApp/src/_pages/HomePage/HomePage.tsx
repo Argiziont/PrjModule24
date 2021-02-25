@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { UserActions } from "../../_actions";
 
 import MonetizationOnIcon from "@material-ui/icons/MonetizationOn";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,8 +15,7 @@ import Container from "@material-ui/core/Container";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Link from "@material-ui/core/Link";
-import { UserActions } from "../../_actions";
-import { useEffect } from "react";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,6 +74,39 @@ export const HomePage: React.FC = () => {
     setAmountForWithdrawal(Number(event.target.value));
   };
 
+  const onWithdrawalClick = async () => {
+    await UserActions.withdrawalFromAccout(amountForWithdrawal || 0);
+
+    UserActions.getBalance().then((moneyAmount) => {
+      setUserBalance(moneyAmount);
+    });
+    setAmountForWithdrawal(0);
+  };
+
+  const onDepositClick = async () => {
+    await UserActions.depositToAccount(amountForDeposit || 0);
+
+    UserActions.getBalance().then((moneyAmount) => {
+      setUserBalance(moneyAmount);
+    });
+    setAmountForDeposit(0);
+  };
+
+  const onAccountStateChange = async () => {
+    if (userAccountState) {
+      await UserActions.closeAccount();
+    }
+    if (!userAccountState) {
+      await UserActions.openAccount();
+    }
+
+    setUserAccountState(!userAccountState);
+  };
+
+  const onLogoutClick = () => {
+    UserActions.logout();
+  };
+
   useEffect(() => {
     let isMounted = true;
     setIsLodaing(true);
@@ -95,7 +128,18 @@ export const HomePage: React.FC = () => {
   }, []);
 
   return isLodaing ? (
-    <div></div>
+    <Grid
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      justify="center"
+      style={{ minHeight: "100vh" }}
+    >
+      <Grid item xs={3}>
+        <CircularProgress />
+      </Grid>
+    </Grid>
   ) : (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -112,7 +156,8 @@ export const HomePage: React.FC = () => {
           <Grid container spacing={4} justify="center">
             <Grid item xs={12}>
               <TextField
-                variant="outlined"
+                  variant="outlined"
+                  label="Your balance"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -130,15 +175,14 @@ export const HomePage: React.FC = () => {
                 }}
               />
             </Grid>
-
             <Grid item xs={12} sm={6}>
               <TextField
                 type="number"
-                variant="outlined"
+                  variant="outlined"
+                  label="Amount of deposit"
                 value={amountForDeposit}
                 onChange={handleDepositChange}
                 InputProps={{
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   startAdornment: (
                     <InputAdornment position="start">
                       <MonetizationOnIcon />
@@ -152,12 +196,7 @@ export const HomePage: React.FC = () => {
                 size="large"
                 variant="contained"
                 onClick={async () => {
-                  await UserActions.depositToAccount(amountForDeposit || 0);
-
-                  UserActions.getBalance().then((moneyAmount) => {
-                    setUserBalance(moneyAmount);
-                  });
-                  setAmountForDeposit(0);
+                  await onDepositClick();
                 }}
               >
                 <Typography
@@ -171,7 +210,9 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                variant="outlined"
+                type="number"
+                  variant="outlined"
+                  label="Amount of withdrawal"
                 value={amountForWithdrawal}
                 onChange={handleWithdrawalChange}
                 InputProps={{
@@ -183,22 +224,17 @@ export const HomePage: React.FC = () => {
                 }}
               />
             </Grid>
-
             <Grid item xs={12} sm={6}>
-              <Button size="large" variant="contained">
+              <Button
+                size="large"
+                variant="contained"
+                onClick={async () => {
+                  await onWithdrawalClick();
+                }}
+              >
                 <Typography
                   component="h1"
                   variant="body1"
-                  onClick={async () => {
-                    await UserActions.withdrawalFromAccout(
-                      amountForWithdrawal || 0
-                    );
-
-                    UserActions.getBalance().then((moneyAmount) => {
-                      setUserBalance(moneyAmount);
-                    });
-                    setAmountForWithdrawal(0);
-                  }}
                   className={classes.margin}
                 >
                   Submit
@@ -214,14 +250,7 @@ export const HomePage: React.FC = () => {
                     color="primary"
                     checked={userAccountState}
                     onChange={async () => {
-                      if (userAccountState) {
-                        await UserActions.closeAccount();
-                      }
-                      if (!userAccountState) {
-                        await UserActions.openAccount();
-                      }
-
-                      setUserAccountState(!userAccountState);
+                      await onAccountStateChange();
                     }}
                   />
                 }
@@ -229,13 +258,7 @@ export const HomePage: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <Link
-                href="#"
-                variant="body2"
-                onClick={() => {
-                  UserActions.logout();
-                }}
-              >
+              <Link href="#" variant="body2" onClick={onLogoutClick}>
                 {"Want to exit? Log out"}
               </Link>
             </Grid>

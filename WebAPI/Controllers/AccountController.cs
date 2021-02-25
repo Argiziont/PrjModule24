@@ -32,7 +32,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't open account", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Message = "Couldn't open account", Status = "Error" }));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't open account", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Message = "Couldn't open account", Status = "Error" }));
 
         }
 
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't close account", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Message = "Couldn't close account", Status = "Error" }));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
@@ -82,7 +82,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't close account", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Message = "Couldn't close account", Status = "Error" }));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
@@ -97,13 +97,14 @@ namespace WebAPI.Controllers
             var account = await _db.GetAccountAsync(userId);
             return account.Match<IActionResult>(
                 acc => Ok(new ApiResponse {Status = "Success", Message = acc.State.ToString()}),
-                BadRequest(new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
+                StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Deposit={amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> DepositMoneyToAccountWithId(string id, decimal amount)
@@ -112,19 +113,20 @@ namespace WebAPI.Controllers
             _db.GetAccountAsync(id).Result.Match(acc => active = acc.State, null);
 
             if (!active)
-                return BadRequest();
+                return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(id, amount);
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
         [HttpPost]
         [Route("Deposit={amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> DepositMoneyToAccount(decimal amount)
@@ -135,19 +137,20 @@ namespace WebAPI.Controllers
             _db.GetAccountAsync(userId).Result.Match(acc => active = acc.State, null);
 
             if (!active)
-                return BadRequest();
+                return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(userId, amount);
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't made deposit", Status = "Error"}));
         }
 
         [Authorize(Roles = "Admin,Moderator")]
         [HttpPost]
         [Route("{id}/Withdrawal={amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> WithdrawalMoneyFromAccountWithId(string id, decimal amount)
@@ -156,20 +159,21 @@ namespace WebAPI.Controllers
             _db.GetAccountAsync(id).Result.Match(acc => active = acc.State, null);
 
             if (!active)
-                return BadRequest();
+                return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(id, -amount);
 
 
             return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't withdrawal money", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Message = "Couldn't withdrawal money", Status = "Error" }));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
         [HttpPost]
         [Route("Withdrawal={amount}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
         [ProducesDefaultResponseType]
         public async Task<IActionResult> WithdrawalMoneyFromAccount(decimal amount)
@@ -180,13 +184,13 @@ namespace WebAPI.Controllers
             _db.GetAccountAsync(userId).Result.Match(acc => active = acc.State, null);
 
             if (!active)
-                return BadRequest();
+                return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(userId, -amount);
 
                 return account.Match<IActionResult>(
                 _ => Ok(),
-                () => BadRequest(new ApiResponse { Message = "Couldn't withdrawal money", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError,new ApiResponse { Message = "Couldn't withdrawal money", Status = "Error" }));
         }
 
         [Authorize(Roles = "Admin,Moderator")]
@@ -201,7 +205,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 acc => Ok(new ApiResponse {Message = acc.Money.ToString(CultureInfo.InvariantCulture), Status = "Success"}),
-                () => BadRequest(new ApiResponse {Message = "Couldn't get balance", Status = "Error"}));
+                () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't get balance", Status = "Error"}));
         }
 
         [Authorize(Roles = "Admin,Moderator,User")]
@@ -218,7 +222,7 @@ namespace WebAPI.Controllers
 
             return account.Match<IActionResult>(
                 acc => Ok(new ApiResponse { Message = acc.Money.ToString(CultureInfo.InvariantCulture), Status = "Success" }),
-                () => BadRequest(new ApiResponse { Message = "Couldn't get balance", Status = "Error" }));
+                () => StatusCode(StatusCodes.Status500InternalServerError, (new ApiResponse { Message = "Couldn't get balance", Status = "Error" })));
         }
     }
 }

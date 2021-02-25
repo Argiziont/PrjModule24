@@ -16,32 +16,29 @@ export const UserActions = {
   withdrawalFromAccout
 };
 
-function login(userModel:LoginModel):void {
-  UserService.login(userModel).then(
-    () => {
-      History.push('/');
-      window.location.reload();
-    },
-    (error) => {
-      console.error(error);
-    //error handling
-    }
-  );
+async function login(userModel: LoginModel): Promise<void> {
+  try {
+    const response = await  UserService.login(userModel);
+    History.push('/');
+    window.location.reload();
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
 }
-function register(userModel:RegisterModel):void {
-  UserService.register(userModel).then(
-    () => {
-      login(new LoginModel({
-        password: userModel.password,
-        username: userModel.username
-      }))
-    
-    },
-    (error) => {
-      console.error(error);
-    //error handling
-    }
-  );
+async function register(userModel: RegisterModel): Promise<void> {
+  try {
+    const response = await login(new LoginModel({
+      password: userModel.password,
+      username: userModel.username
+    }));
+
+    return response;
+  } 
+  catch(error) {
+    console.error(error);
+  }
 }
 function logout():void {
   UserService.logout();

@@ -83,40 +83,6 @@ namespace WebAPI
                    Description = "Type into the textbox: Bearer {your JWT token}."
                });
             });
-
-            #region 1
-
-            //services.AddSwaggerGen(swagger =>
-            //{
-            //    swagger.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
-            //    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            //    {
-            //        Name = "Authorization",
-            //        Type = SecuritySchemeType.ApiKey,
-            //        Scheme = "Bearer",
-            //        BearerFormat = "JWT",
-            //        In = ParameterLocation.Header,
-            //        Description =
-            //            "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
-            //    });
-            //    //Swagger bearer authorization
-            //    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-            //    {
-            //        {
-            //            new OpenApiSecurityScheme
-            //            {
-            //                Reference = new OpenApiReference
-            //                {
-            //                    Type = ReferenceType.SecurityScheme,
-            //                    Id = "Bearer"
-            //                }
-            //            },
-            //            Array.Empty<string>()
-            //        }
-            //    });
-            //});
-
-            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -129,8 +95,6 @@ namespace WebAPI
 
                 app.UseOpenApi();
                 app.UseSwaggerUi3();
-                //app.UseSwagger();
-                //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPI v1"));
             }
 
             app.UseHttpsRedirection();

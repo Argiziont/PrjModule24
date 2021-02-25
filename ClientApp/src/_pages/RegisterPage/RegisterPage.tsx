@@ -70,13 +70,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
               password:data.password,
               username: data.username
             });
-
             UserActions.register(registerData);
-            // userActions
-            //   .login(data.username, data.password, SnackCallback)
-            //   .then((response) => {
-            //     //setConnected(true);
-            //   });
           })}
         >
           <TextField
