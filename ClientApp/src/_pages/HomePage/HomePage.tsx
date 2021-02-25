@@ -16,6 +16,13 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Link from "@material-ui/core/Link";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import NumberFormat from "react-number-format";
+
+function Alert(props: AlertProps) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,6 +63,56 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+export interface SnackbarMessage {
+  message: string;
+  key: number;
+}
+
+export interface State {
+  open: boolean;
+  snackPack: SnackbarMessage[];
+  messageInfo?: SnackbarMessage;
+}
+
+interface NumberFormatCustomProps {
+  inputRef: (instance: NumberFormat | null) => void;
+  onChange: (event: { target: { name: string; value: string } }) => void;
+  name: string;
+}
+
+function NumberFormatCustom(props: NumberFormatCustomProps) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          },
+        });
+      }}
+      isAllowed={(values) => {
+        const { floatValue } = values;
+        if (floatValue != undefined) {
+          if (floatValue >= 0 && floatValue <= 99999) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }}
+      thousandSeparator
+      isNumericString
+    />
+  );
+}
+
 export const HomePage: React.FC = () => {
   const classes = useStyles();
   const [userBalance, setUserBalance] = useState<string>();
@@ -63,6 +120,25 @@ export const HomePage: React.FC = () => {
   const [amountForDeposit, setAmountForDeposit] = useState<number>(0);
   const [amountForWithdrawal, setAmountForWithdrawal] = useState<number>(0);
   const [userAccountState, setUserAccountState] = useState<boolean>(true);
+  const [openSnack, setOpenSnack] = React.useState<boolean>(false);
+  const [snackPack, setSnackPack] = React.useState<SnackbarMessage[]>([]);
+  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
+
+  const handleSnackOpen = (message: string) => () => {
+    setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+  };
+
+  const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnack(false);
+  };
+
+  const handleSnackExited = () => {
+    setMessageInfo(undefined);
+  };
 
   const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmountForDeposit(Number(event.target.value));
@@ -93,6 +169,7 @@ export const HomePage: React.FC = () => {
   };
 
   const onAccountStateChange = async () => {
+    handleSnackOpen('Message A');
     if (userAccountState) {
       await UserActions.closeAccount();
     }
@@ -126,7 +203,19 @@ export const HomePage: React.FC = () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
   }, []);
-
+  
+  React.useEffect(() => {
+    if (snackPack.length && !messageInfo) {
+      // Set a new snack when we don't have an active one
+      setMessageInfo({ ...snackPack[0] });
+      setSnackPack((prev) => prev.slice(1));
+      setOpenSnack(true);
+    } else if (snackPack.length && messageInfo && open) {
+      // Close an active snack when a new one is added
+      setOpenSnack(false);
+    }
+  }, [snackPack, messageInfo, openSnack]);
+  
   return isLodaing ? (
     <Grid
       container
@@ -156,8 +245,8 @@ export const HomePage: React.FC = () => {
           <Grid container spacing={4} justify="center">
             <Grid item xs={12}>
               <TextField
-                  variant="outlined"
-                  label="Your balance"
+                variant="outlined"
+                label="Your balance"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -177,12 +266,14 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                type="number"
-                  variant="outlined"
-                  label="Amount of deposit"
+                disabled={!userAccountState}
+                variant="outlined"
+                label="Amount of deposit"
                 value={amountForDeposit}
                 onChange={handleDepositChange}
                 InputProps={{
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  inputComponent: NumberFormatCustom as any,
                   startAdornment: (
                     <InputAdornment position="start">
                       <MonetizationOnIcon />
@@ -193,6 +284,7 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
+                disabled={!userAccountState}
                 size="large"
                 variant="contained"
                 onClick={async () => {
@@ -210,12 +302,14 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                type="number"
-                  variant="outlined"
-                  label="Amount of withdrawal"
+                disabled={!userAccountState}
+                variant="outlined"
+                label="Amount of withdrawal"
                 value={amountForWithdrawal}
                 onChange={handleWithdrawalChange}
                 InputProps={{
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  inputComponent: NumberFormatCustom as any,
                   startAdornment: (
                     <InputAdornment position="start">
                       <MonetizationOnIcon />
@@ -226,6 +320,7 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
+                disabled={!userAccountState}
                 size="large"
                 variant="contained"
                 onClick={async () => {
@@ -264,7 +359,22 @@ export const HomePage: React.FC = () => {
             </Grid>
           </Grid>
         </div>
-      </div>
+        </div>
+        <Button onClick={handleSnackOpen('Message A')}>Show message A</Button>
+      <Button onClick={handleSnackOpen('Message B')}>Show message B</Button>
+        <Snackbar  key={messageInfo ? messageInfo.key : undefined}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={openSnack}
+        autoHideDuration={6000}
+        onClose={handleSnackClose}
+        onExited={handleSnackExited}>
+        <Alert onClose={handleSnackClose} severity="success">
+        {messageInfo ? messageInfo.message : undefined}
+        </Alert>
+        </Snackbar>
     </Container>
   );
 };
