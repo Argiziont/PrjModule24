@@ -16,8 +16,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import Link from "@material-ui/core/Link";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert, { AlertProps, Color } from "@material-ui/lab/Alert";
 import NumberFormat from "react-number-format";
 
 function Alert(props: AlertProps) {
@@ -65,6 +65,7 @@ const useStyles = makeStyles((theme) => ({
 
 export interface SnackbarMessage {
   message: string;
+  type: Color;
   key: number;
 }
 
@@ -122,14 +123,20 @@ export const HomePage: React.FC = () => {
   const [userAccountState, setUserAccountState] = useState<boolean>(true);
   const [openSnack, setOpenSnack] = React.useState<boolean>(false);
   const [snackPack, setSnackPack] = React.useState<SnackbarMessage[]>([]);
-  const [messageInfo, setMessageInfo] = React.useState<SnackbarMessage | undefined>(undefined);
+  const [messageInfo, setMessageInfo] = React.useState<
+    SnackbarMessage | undefined
+  >(undefined);
 
-  const handleSnackOpen = (message: string) => () => {
-    setSnackPack((prev) => [...prev, { message, key: new Date().getTime() }]);
+  const handleSnackOpen = (message: string, type: Color) => () => {
+    console.log("Hello");
+    setSnackPack((prev) => [
+      ...prev,
+      { message, key: new Date().getTime(), type },
+    ]);
   };
 
   const handleSnackClose = (event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
@@ -151,8 +158,13 @@ export const HomePage: React.FC = () => {
   };
 
   const onWithdrawalClick = async () => {
-    await UserActions.withdrawalFromAccout(amountForWithdrawal || 0);
-
+    try {
+      await UserActions.withdrawalFromAccout(amountForWithdrawal || 0);
+      (handleSnackOpen("Money withdrawal success", "success"))();
+    }
+    catch (error) {
+      (handleSnackOpen(error, "error"))();
+    }
     UserActions.getBalance().then((moneyAmount) => {
       setUserBalance(moneyAmount);
     });
@@ -160,8 +172,13 @@ export const HomePage: React.FC = () => {
   };
 
   const onDepositClick = async () => {
-    await UserActions.depositToAccount(amountForDeposit || 0);
-
+    try {
+      await UserActions.depositToAccount(amountForDeposit || 0);
+      (handleSnackOpen("Money deposit success", "success"))();
+    }
+    catch (error) {
+      (handleSnackOpen(error, "error"))();
+    }
     UserActions.getBalance().then((moneyAmount) => {
       setUserBalance(moneyAmount);
     });
@@ -169,12 +186,21 @@ export const HomePage: React.FC = () => {
   };
 
   const onAccountStateChange = async () => {
-    handleSnackOpen('Message A');
     if (userAccountState) {
-      await UserActions.closeAccount();
+      try {
+        await UserActions.closeAccount();
+        (handleSnackOpen("Account closed", "info"))();
+      } catch (error) {
+        (handleSnackOpen(error, "error"))();
+      }
     }
     if (!userAccountState) {
-      await UserActions.openAccount();
+      try {
+        await UserActions.openAccount();
+        (handleSnackOpen("Account opened", "success"))();
+      } catch (error) {
+        (handleSnackOpen(error, "error"))();
+      }
     }
 
     setUserAccountState(!userAccountState);
@@ -203,8 +229,8 @@ export const HomePage: React.FC = () => {
       isMounted = false;
     }; // use effect cleanup to set flag false, if unmounted
   }, []);
-  
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (snackPack.length && !messageInfo) {
       // Set a new snack when we don't have an active one
       setMessageInfo({ ...snackPack[0] });
@@ -215,7 +241,7 @@ export const HomePage: React.FC = () => {
       setOpenSnack(false);
     }
   }, [snackPack, messageInfo, openSnack]);
-  
+
   return isLodaing ? (
     <Grid
       container
@@ -359,22 +385,25 @@ export const HomePage: React.FC = () => {
             </Grid>
           </Grid>
         </div>
-        </div>
-        <Button onClick={handleSnackOpen('Message A')}>Show message A</Button>
-      <Button onClick={handleSnackOpen('Message B')}>Show message B</Button>
-        <Snackbar  key={messageInfo ? messageInfo.key : undefined}
+      </div>
+      <Snackbar
+        key={messageInfo ? messageInfo.key : undefined}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
+          vertical: "bottom",
+          horizontal: "left",
         }}
         open={openSnack}
         autoHideDuration={6000}
         onClose={handleSnackClose}
-        onExited={handleSnackExited}>
-        <Alert onClose={handleSnackClose} severity="success">
-        {messageInfo ? messageInfo.message : undefined}
+        onExited={handleSnackExited}
+      >
+        <Alert
+          onClose={handleSnackClose}
+          severity={messageInfo ? messageInfo.type : undefined}
+        >
+          {messageInfo ? messageInfo.message : undefined}
         </Alert>
-        </Snackbar>
+      </Snackbar>
     </Container>
   );
 };
