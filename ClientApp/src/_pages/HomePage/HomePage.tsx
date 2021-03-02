@@ -128,7 +128,6 @@ export const HomePage: React.FC = () => {
   >(undefined);
 
   const handleSnackOpen = (message: string, type: Color) => () => {
-    console.log("Hello");
     setSnackPack((prev) => [
       ...prev,
       { message, key: new Date().getTime(), type },
