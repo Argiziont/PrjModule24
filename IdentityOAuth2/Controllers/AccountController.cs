@@ -4,13 +4,16 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityOAuth2.Controllers
 {
     [AllowAnonymous, Route("account")]
     public class AccountController : Controller
-    {   
+    {
+        private UserManager<AppUser> userManager;
+        private SignInManager<AppUser> signInManager;
         [Route("google-login")]
         public IActionResult GoogleLogin()
         {
