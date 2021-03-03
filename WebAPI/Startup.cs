@@ -15,6 +15,9 @@ using Newtonsoft.Json;
 using WebAPI.Models;
 using WebAPI.Services.DataBase;
 using WebAPI.Services.Interfaces;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Util.Store;
 
 namespace WebAPI
 {
@@ -50,12 +53,7 @@ namespace WebAPI
                 .AddDefaultTokenProviders();
 
             // Adding Authentication
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            services.AddAuthentication().AddJwtBearer(options =>
             {
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
@@ -117,3 +115,5 @@ namespace WebAPI
         }
     }
 }
+//346764286698-sf0m1oaca445iioes742gjvtcpeeqk0p.apps.googleusercontent.com
+//bPcaBLfVAesqi_xC2oBqI6bZ

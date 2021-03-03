@@ -159,10 +159,9 @@ export const HomePage: React.FC = () => {
   const onWithdrawalClick = async () => {
     try {
       await UserActions.withdrawalFromAccout(amountForWithdrawal || 0);
-      (handleSnackOpen("Money withdrawal success", "success"))();
-    }
-    catch (error) {
-      (handleSnackOpen(error, "error"))();
+      handleSnackOpen("Money withdrawal success", "success")();
+    } catch (error) {
+      handleSnackOpen(error, "error")();
     }
     UserActions.getBalance().then((moneyAmount) => {
       setUserBalance(moneyAmount);
@@ -173,10 +172,9 @@ export const HomePage: React.FC = () => {
   const onDepositClick = async () => {
     try {
       await UserActions.depositToAccount(amountForDeposit || 0);
-      (handleSnackOpen("Money deposit success", "success"))();
-    }
-    catch (error) {
-      (handleSnackOpen(error, "error"))();
+      handleSnackOpen("Money deposit success", "success")();
+    } catch (error) {
+      handleSnackOpen(error, "error")();
     }
     UserActions.getBalance().then((moneyAmount) => {
       setUserBalance(moneyAmount);
@@ -188,17 +186,17 @@ export const HomePage: React.FC = () => {
     if (userAccountState) {
       try {
         await UserActions.closeAccount();
-        (handleSnackOpen("Account closed", "info"))();
+        handleSnackOpen("Account closed", "info")();
       } catch (error) {
-        (handleSnackOpen(error, "error"))();
+        handleSnackOpen(error, "error")();
       }
     }
     if (!userAccountState) {
       try {
         await UserActions.openAccount();
-        (handleSnackOpen("Account opened", "success"))();
+        handleSnackOpen("Account opened", "success")();
       } catch (error) {
-        (handleSnackOpen(error, "error"))();
+        handleSnackOpen(error, "error")();
       }
     }
 
