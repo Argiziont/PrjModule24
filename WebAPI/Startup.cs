@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,9 +14,6 @@ using Newtonsoft.Json;
 using WebAPI.Models;
 using WebAPI.Services.DataBase;
 using WebAPI.Services.Interfaces;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Flows;
-using Google.Apis.Util.Store;
 
 namespace WebAPI
 {
@@ -52,7 +48,7 @@ namespace WebAPI
                 .AddEntityFrameworkStores<ApplicationContext>()
                 .AddDefaultTokenProviders();
 
-            // Adding Authentication
+            // Adding Authentications
             services.AddAuthentication().AddJwtBearer(options =>
             {
                 options.SaveToken = true;

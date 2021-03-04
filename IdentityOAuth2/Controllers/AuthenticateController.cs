@@ -5,31 +5,28 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using IdentityOAuth2.Models;
+using IdentityOAuth2.Models.Authenticate_Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using WebAPI.Models;
-using WebAPI.Models.Authenticate_Models;
-using WebAPI.Services.Interfaces;
 
-namespace WebAPI.Controllers
+namespace IdentityOAuth2.Controllers
 {
     [Authorize]
     [ApiController]
     public class AuthenticateController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IEfFileFolderContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         public AuthenticateController(UserManager<ApplicationUser> userManager,
-            IConfiguration configuration, IEfFileFolderContext dbContext)
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
-            _dbContext = dbContext;
         }
 
         [AllowAnonymous]
@@ -68,13 +65,6 @@ namespace WebAPI.Controllers
                 ExpirationDate = token.ValidTo
             });
         }
-        //[AllowAnonymous]
-        //[HttpPost("User/GoogleLogin")]
-
-        //public async Task<IActionResult> GoogleLogin()
-        //{
-          
-        //}
 
         [AllowAnonymous]
         [HttpPost("User/Register")]
@@ -115,20 +105,6 @@ namespace WebAPI.Controllers
                     new ApiResponse
                     { Status = "Error", Message = errors });
             }
-
-            await _dbContext.AddAccountAsync(new UserBankingAccount
-            {
-                ApplicationUser = user,
-                Money = 0,
-                State = false
-            });
-
-            await _dbContext.AddUserProfileAsync(new UserProfile
-            {
-                Age = 15,
-                Name = "NameTEMPLATE",
-                ApplicationUser = user
-            });
 
             return Ok(new ApiResponse {Status = "Success", Message = "User created successfully!"});
         }

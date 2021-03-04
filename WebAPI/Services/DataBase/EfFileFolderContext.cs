@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using LanguageExt;
+﻿using LanguageExt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WebAPI.Models;
 using WebAPI.Services.Interfaces;
 
@@ -19,7 +19,25 @@ namespace WebAPI.Services.DataBase
             _userManager = userManager;
         }
 
-        public async Task<List<ApplicationUser>> GetUsers()
+        public async Task CreateAccountsAsync(ApplicationUser user)
+        {
+
+            await AddAccountAsync(new UserBankingAccount
+            {
+                ApplicationUser = user,
+                Money = 0,
+                State = false
+            });
+
+            await AddUserProfileAsync(new UserProfile
+            {
+                Age = 15,
+                Name = "NameTEMPLATE",
+                ApplicationUser = user
+            });
+        }
+
+        public async Task<List<ApplicationUser>> GetUsersAsync()
         {
             var users = new List<ApplicationUser>();
             foreach (var user in _userManager.Users)
@@ -35,10 +53,12 @@ namespace WebAPI.Services.DataBase
             return users;
         }
 
-        public async Task<Option<ApplicationUser>> GetUser(string id)
+        public async Task<Option<ApplicationUser>> GetUserAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return null;
+            if (user.BankingAccount == null && user.Profile == null)
+                await CreateAccountsAsync(user);
 
             var userBankAccount = await GetAccountAsync(user.Id);
             var userProfile = await GetUserProfileAsync(user.Id);
@@ -65,7 +85,11 @@ namespace WebAPI.Services.DataBase
         public async Task<Option<UserBankingAccount>> UpdateAccountMoneyAsync(string id, decimal amount)
         {
             var account = await GetAccountAsync(id);
-
+            if (account==null)
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                await CreateAccountsAsync(user);
+            }
             return account.Match(usr =>
             {
                 usr.Money += amount;
@@ -78,7 +102,11 @@ namespace WebAPI.Services.DataBase
         public async Task<Option<UserBankingAccount>> UpdateAccountStateAsync(string id, bool state)
         {
             var account = await GetAccountAsync(id);
-
+            if (account == null)
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                await CreateAccountsAsync(user);
+            }
             return account.Match(usr =>
             {
                 usr.State = state;

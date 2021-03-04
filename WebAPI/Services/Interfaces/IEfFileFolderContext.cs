@@ -8,8 +8,11 @@ namespace WebAPI.Services.Interfaces
     public interface IEfFileFolderContext
     {
         //ApplicationUser Actions
-        public Task<List<ApplicationUser>> GetUsers();
-        public Task<Option<ApplicationUser>> GetUser(string id);
+        public Task CreateAccountsAsync(ApplicationUser user);
+
+        //ApplicationUser Actions
+        public Task<List<ApplicationUser>> GetUsersAsync();
+        public Task<Option<ApplicationUser>> GetUserAsync(string id);
 
         //UserBankingAccount Actions
         public Task<Option<UserBankingAccount>> AddAccountAsync(UserBankingAccount account);

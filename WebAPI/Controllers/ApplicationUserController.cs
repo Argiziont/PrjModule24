@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> Get()
         {
-            var users = await _dbContext.GetUsers();
+            var users = await _dbContext.GetUsersAsync();
 
             if (users.Count > 0)
                 return Ok(users);
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> GetWithId(string id)
         {
-            var user = await _dbContext.GetUser(id);
+            var user = await _dbContext.GetUserAsync(id);
 
             return user.Match<IActionResult>(Ok, NotFound());
         }
