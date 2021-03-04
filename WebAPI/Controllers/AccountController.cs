@@ -208,7 +208,8 @@ namespace WebAPI.Controllers
                 () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't get balance", Status = "Error"}));
         }
 
-        [Authorize(Roles = "Admin,Moderator,User")]
+        [AllowAnonymous]
+        //[Authorize(Roles = "Admin,Moderator,User")]
         [HttpGet]
         [Route("GetBalance")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
@@ -216,6 +217,7 @@ namespace WebAPI.Controllers
         [ProducesDefaultResponseType]
         public async Task<IActionResult> GetAccountBalance()
         {
+            var user = User;
             var userId = User.GetLoggedInUserId<string>();
 
             var account = await _db.GetAccountAsync(userId);

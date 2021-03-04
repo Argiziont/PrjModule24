@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Text;
+using IdentityOAuth2.Models;
+using IdentityOAuth2.Services.DataBase;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -11,8 +13,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using IdentityOAuth2.Models;
-using IdentityOAuth2.Services.DataBase;
 
 namespace IdentityOAuth2
 {
@@ -39,6 +39,7 @@ namespace IdentityOAuth2
             var connectionString = Configuration.GetConnectionString("UserDb");
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(connectionString));
+
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationContext>()

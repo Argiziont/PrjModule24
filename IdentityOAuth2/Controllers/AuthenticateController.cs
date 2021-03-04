@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using IdentityOAuth2.Models;
+﻿using IdentityOAuth2.Models;
 using IdentityOAuth2.Models.Authenticate_Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace IdentityOAuth2.Controllers
 {
@@ -22,11 +22,14 @@ namespace IdentityOAuth2.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
         public AuthenticateController(UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _signInManager = signInManager;
         }
 
         [AllowAnonymous]
@@ -46,6 +49,7 @@ namespace IdentityOAuth2.Controllers
                 new(ClaimTypes.NameIdentifier, user.Id),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+            await _signInManager.SignInAsync(user, false);
 
             authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
@@ -58,10 +62,9 @@ namespace IdentityOAuth2.Controllers
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
-
             return Ok(new UserResponse
             {
-                Token= new JwtSecurityTokenHandler().WriteToken(token),
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
                 ExpirationDate = token.ValidTo
             });
         }
@@ -76,7 +79,7 @@ namespace IdentityOAuth2.Controllers
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new ApiResponse {Status = "Error", Message = "User already exists!"});
+                    new ApiResponse { Status = "Error", Message = "User already exists!" });
 
 
             var user = new ApplicationUser
@@ -90,13 +93,13 @@ namespace IdentityOAuth2.Controllers
 
             if (!addResult.Succeeded)
             {
-                var errors= addResult.Errors.Aggregate("", (current, error) => current + ("Code: "+error.Code+"\nDescription: " + error.Description + "\n"));
+                var errors = addResult.Errors.Aggregate("", (current, error) => current + ("Code: " + error.Code + "\nDescription: " + error.Description + "\n"));
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     new ApiResponse
-                        { Status = "Error", Message = errors });
+                    { Status = "Error", Message = errors });
             }
 
-            var addRoleAsyncResult= await _userManager.AddToRoleAsync(user, "User");
+            var addRoleAsyncResult = await _userManager.AddToRoleAsync(user, "User");
 
             if (!addRoleAsyncResult.Succeeded)
             {
@@ -106,7 +109,7 @@ namespace IdentityOAuth2.Controllers
                     { Status = "Error", Message = errors });
             }
 
-            return Ok(new ApiResponse {Status = "Success", Message = "User created successfully!"});
+            return Ok(new ApiResponse { Status = "Success", Message = "User created successfully!" });
         }
 
         [AllowAnonymous]
@@ -121,6 +124,21 @@ namespace IdentityOAuth2.Controllers
                 return Ok();
             }
             return Unauthorized();
+        }
+        [Authorize]
+        [HttpGet("User/Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await _signInManager.SignOutAsync();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+
         }
     }
 }
