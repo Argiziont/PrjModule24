@@ -208,8 +208,7 @@ namespace WebAPI.Controllers
                 () => StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse {Message = "Couldn't get balance", Status = "Error"}));
         }
 
-        [AllowAnonymous]
-        //[Authorize(Roles = "Admin,Moderator,User")]
+        [Authorize(Roles = "Admin,Moderator,User")]
         [HttpGet]
         [Route("GetBalance")]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]

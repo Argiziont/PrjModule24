@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -48,8 +49,13 @@ namespace WebAPI
                 .AddEntityFrameworkStores<ApplicationContext>()
                 .AddDefaultTokenProviders();
 
-            // Adding Authentications
-            services.AddAuthentication().AddJwtBearer(options =>
+            // Adding Authentication
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
                 options.SaveToken = true;
                 options.RequireHttpsMetadata = false;
@@ -68,14 +74,14 @@ namespace WebAPI
                 document.OperationProcessors.Add(
                     new AspNetCoreOperationSecurityScopeProcessor("JWT"));
                 document.AddSecurity("JWT", Enumerable.Empty<string>(), new NSwag.OpenApiSecurityScheme
-               {
-                   Type = OpenApiSecuritySchemeType.ApiKey,
-                   Name = "Authorization",
-                   Scheme = "Bearer",
-                   BearerFormat = "JWT",
-                   In = OpenApiSecurityApiKeyLocation.Header,
-                   Description = "Type into the textbox: Bearer {your JWT token}."
-               });
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Type into the textbox: Bearer {your JWT token}."
+                });
             });
         }
 
@@ -111,5 +117,3 @@ namespace WebAPI
         }
     }
 }
-//346764286698-sf0m1oaca445iioes742gjvtcpeeqk0p.apps.googleusercontent.com
-//bPcaBLfVAesqi_xC2oBqI6bZ
