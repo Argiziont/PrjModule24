@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { LoginPrivateRoute } from "../../_components";
-import { LoginPage } from "../LoginPage";
-import { RegisterPage } from "../RegisterPage";
-import { HomePage } from "../HomePage";
+import { LoginPage, HomePage, RegisterPage } from "../";
 
 export const AppPage: React.FC = () => {
   
@@ -11,12 +9,28 @@ export const AppPage: React.FC = () => {
   const [isRegister, setIsRegister] = useState<boolean>(false);
 
   return (
-    <Router >
-    <Switch>  
-    <LoginPrivateRoute exact path="/" component={() => (<HomePage></HomePage>)} />
-    <Route exact path="/Login" component={() => (<LoginPage setIsRegister={setIsRegister} ></LoginPage>)} />
-    <Route exact path="/Register" component={() => (<RegisterPage setIsRegister={setIsRegister}></RegisterPage>)} />
-    </Switch>
-  </Router>
+    <Router>
+      <Switch>
+        <LoginPrivateRoute
+          exact
+          path="/"
+          component={() => <HomePage></HomePage>}
+        />
+        <Route
+          exact
+          path="/Login"
+          component={() => (
+            <LoginPage setIsRegister={setIsRegister}></LoginPage>
+          )}
+        />
+        <Route
+          exact
+          path="/Register"
+          component={() => (
+            <RegisterPage setIsRegister={setIsRegister}></RegisterPage>
+          )}
+        />
+      </Switch>
+    </Router>
   );
-}
+};
