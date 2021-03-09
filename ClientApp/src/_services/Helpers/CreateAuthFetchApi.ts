@@ -22,7 +22,7 @@ export const CreateAuthFetchApi = (userToken: IAuth):{ fetch: (url: RequestInfo,
         },
       }).then((response) => {
         if (response.status === 401) {
-          sessionStorage.removeItem("user");
+          localStorage.removeItem("User");
         }
         return response;
       });

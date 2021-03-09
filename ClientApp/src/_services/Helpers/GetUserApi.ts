@@ -4,11 +4,12 @@ import {
 } from "../../_actions";
 import {
   CreateAuthFetchApi,
-  ApiUrl
+  ApiUrl,
+  AuthUrl
 } from "../../_services";
 
 export const UserAuthApi = (tokenHolder: string): AuthenticateClient => {
-  return new AuthenticateClient(ApiUrl,
+  return new AuthenticateClient(AuthUrl,
     CreateAuthFetchApi({
       Authorization: tokenHolder
     }));

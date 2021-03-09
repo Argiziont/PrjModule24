@@ -1,4 +1,3 @@
-//export * from './webApiClient';
 export * from './Interfaces/ILoginRegisterProps';
 export * from './Interfaces/IAuth';
 export * from './Helpers/History';
