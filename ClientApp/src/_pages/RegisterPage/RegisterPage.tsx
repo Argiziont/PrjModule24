@@ -50,7 +50,13 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
   setIsRegister,
 }) => {
   const classes = useStyles();
-  const { register, handleSubmit,watch, control, errors } = useForm<RegisterInputs>();
+  const { register, handleSubmit, watch, control, errors } = useForm<RegisterInputs>();
+  
+  const onLoginRedirectClick = () => {
+    setIsRegister(false);
+    History.push('/Login');
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -160,12 +166,7 @@ export const RegisterPage: React.FC<ILoginRegisterProps> = ({
           <Grid container>
             <Grid item xs></Grid>
             <Grid item>
-              <Link href="#" variant="body2" onClick={
-                () => {
-                  setIsRegister(false);
-                  History.push('/Login');
-                }
-              }>
+              <Link href="#" variant="body2" onClick={onLoginRedirectClick}>
                 {"Already have an account? Sign In"}
               </Link>
             </Grid>

@@ -143,6 +143,7 @@ namespace IdentityOAuth2.Controllers
     }
 }
 
+//Test values for login
 //{
 // "Username": "SuperUser",
 // "Email": "user@example.com",
