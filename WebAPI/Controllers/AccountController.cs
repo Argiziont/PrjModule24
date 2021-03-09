@@ -114,6 +114,8 @@ namespace WebAPI.Controllers
 
             if (!active)
                 return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
+            if(amount>100000)
+                return BadRequest(new ApiResponse { Message = "Amount is too big", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(id, amount);
 
@@ -138,6 +140,8 @@ namespace WebAPI.Controllers
 
             if (!active)
                 return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
+            if (amount > 100000)
+                return BadRequest(new ApiResponse { Message = "Amount is too big", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(userId, amount);
 
@@ -160,6 +164,8 @@ namespace WebAPI.Controllers
 
             if (!active)
                 return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
+            if (amount > 100000)
+                return BadRequest(new ApiResponse { Message = "Amount is too big", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(id, -amount);
 
@@ -185,6 +191,8 @@ namespace WebAPI.Controllers
 
             if (!active)
                 return BadRequest(new ApiResponse { Message = "Account isn't active", Status = "Error" });
+            if (amount > 100000)
+                return BadRequest(new ApiResponse { Message = "Amount is too big", Status = "Error" });
 
             var account = await _db.UpdateAccountMoneyAsync(userId, -amount);
 

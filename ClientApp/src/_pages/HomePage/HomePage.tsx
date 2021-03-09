@@ -96,18 +96,18 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
           },
         });
       }}
-      isAllowed={(values) => {
-        const { floatValue } = values;
-        if (floatValue != undefined) {
-          if (floatValue >= 0 && floatValue <= 99999) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      }}
+      // isAllowed={
+      //   (values) => {
+      //   const { floatValue } = values;
+      //   if (floatValue != undefined) {
+      //     if (floatValue >= 0 && floatValue <= 100000) {
+      //       return true;
+      //     } else {
+      //       return false;
+      //     }
+      //   } else {
+      //     return false;
+      //   }}}
       thousandSeparator
       isNumericString
     />
@@ -118,6 +118,8 @@ export const HomePage: React.FC = () => {
   const classes = useStyles();
   const [userBalance, setUserBalance] = useState<string>();
   const [isLodaing, setIsLodaing] = useState<boolean>(true);
+  const [isDepositDisabled, setIsDepositDisabled] = useState<boolean>(true);
+  const [isWithdrawalDisabled, setIsWithdrawalDisabled] = useState<boolean>(true);
   const [amountForDeposit, setAmountForDeposit] = useState<number>(0);
   const [amountForWithdrawal, setAmountForWithdrawal] = useState<number>(0);
   const [userAccountState, setUserAccountState] = useState<boolean>(true);
@@ -147,13 +149,54 @@ export const HomePage: React.FC = () => {
   };
 
   const handleDepositChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAmountForDeposit(Number(event.target.value));
+    const amount = Number(event.target.value);
+
+    if (isNaN(amount)) {
+      handleSnackOpen("Amount isn't a number", "error")();
+      setIsDepositDisabled(true);
+    }
+      
+    if (amount > 100000 || amount <= 0)
+      setIsDepositDisabled(true);
+    else
+      setIsDepositDisabled(false);
+      
+    if (amount > 100000) {
+      handleSnackOpen("Amount couldn't be greater than 100000", "error")();
+      
+      //return;
+    }
+    if (amount <= 0) {
+      handleSnackOpen("Amount couldn't be less or equal 0", "error")();
+      //return;
+    }
+    setAmountForDeposit(amount);
   };
 
   const handleWithdrawalChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setAmountForWithdrawal(Number(event.target.value));
+    const amount = Number(event.target.value);
+    
+    if (isNaN(amount)) {
+      handleSnackOpen("Amount isn't a number", "error")();
+      setIsWithdrawalDisabled(true);
+    }
+
+    if (amount > 100000 || amount <= 0)
+      setIsWithdrawalDisabled(true);
+    else
+      setIsWithdrawalDisabled(false);
+    
+    if (amount > 100000) {
+      handleSnackOpen("Amount couldn't be less or equal 0", "error")();
+      //return;
+    }
+    if (amount <= 0) {
+      handleSnackOpen("Amount couldn't be less than 0", "error")();
+      //return;
+    }
+    setAmountForWithdrawal(amount);
   };
 
   const onWithdrawalClick = async () => {
@@ -307,7 +350,7 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
-                disabled={!userAccountState}
+                disabled={!userAccountState||isDepositDisabled}
                 size="large"
                 variant="contained"
                 onClick={async () => {
@@ -343,7 +386,7 @@ export const HomePage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button
-                disabled={!userAccountState}
+                disabled={!userAccountState||isWithdrawalDisabled}
                 size="large"
                 variant="contained"
                 onClick={async () => {
