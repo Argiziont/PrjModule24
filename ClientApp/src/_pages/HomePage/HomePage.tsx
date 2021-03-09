@@ -162,11 +162,11 @@ export const HomePage: React.FC = () => {
       setIsDepositDisabled(false);
       
     if (amount > 100000) {
-      handleSnackOpen("Amount couldn't be greater than 100000", "error")();
+      handleSnackOpen("Amount couldn't be greater than 100,000", "error")();
       
       //return;
     }
-    if (amount <= 0) {
+    if (amount < 0) {
       handleSnackOpen("Amount couldn't be less or equal 0", "error")();
       //return;
     }
@@ -189,10 +189,10 @@ export const HomePage: React.FC = () => {
       setIsWithdrawalDisabled(false);
     
     if (amount > 100000) {
-      handleSnackOpen("Amount couldn't be less or equal 0", "error")();
+      handleSnackOpen("Amount couldn't be greater than 100,000", "error")();
       //return;
     }
-    if (amount <= 0) {
+    if (amount < 0) {
       handleSnackOpen("Amount couldn't be less than 0", "error")();
       //return;
     }
